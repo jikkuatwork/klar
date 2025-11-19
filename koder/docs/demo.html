@@ -1,0 +1,2413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AssetConnect Pro - Portfolio Management Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: rgba(15, 20, 25, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-items {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-item {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: rgba(15, 20, 25, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(59, 130, 246, 0.1);
+            padding: 2rem 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border-left-color: #3b82f6;
+        }
+
+        .sidebar-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            opacity: 0.7;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .filters-container {
+            background: rgba(15, 20, 25, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .filter-tab {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .filter-tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            color: #cbd5e1;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .filter-input, .filter-select {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-select option {
+            background: #1e293b;
+            color: #ffffff;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #3b82f6, #06b6d4);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .data-table {
+            background: rgba(15, 20, 25, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: rgba(30, 41, 59, 0.8);
+            color: #cbd5e1;
+            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            font-size: 0.9rem;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            color: #e2e8f0;
+        }
+
+        .table tr:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .amount {
+            font-weight: 600;
+            color: #3b82f6;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 2rem;
+            background: rgba(15, 20, 25, 0.6);
+        }
+
+        .pagination-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 6px;
+            color: #3b82f6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover, .pagination-btn.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(15, 20, 25, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem;
+            padding-left: 3rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        .networking-features {
+            background: rgba(15, 20, 25, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .feature-item {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">AssetConnect Pro</div>
+        <div class="nav-items">
+            <a href="#" class="nav-item active">Dashboard</a>
+            <a href="#" class="nav-item">Portfolio</a>
+            <a href="#" class="nav-item">Analytics</a>
+            <a href="#" class="nav-item">Network</a>
+            <a href="#" class="nav-item">Events</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Home</div>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏠</span>
+                    Home
+                </a>
+                <a href="#" class="sidebar-item active">
+                    <span class="sidebar-icon">📊</span>
+                    Dashboard
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Entities</div>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏠</span>
+                    Home
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏦</span>
+                    Family Offices
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">⭐</span>
+                    Startup Angels & Syndicates
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🚀</span>
+                    Incubators & Accelerators
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">💰</span>
+                    Venture Capital Funds
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏢</span>
+                    Private Equity Funds
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">📈</span>
+                    Funds of Funds
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">📊</span>
+                    Hedge Funds
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏛️</span>
+                    Private Banking
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏦</span>
+                    Investment Banks
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">💎</span>
+                    Wealth Management
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🤝</span>
+                    Fund Placement Agencies
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏛️</span>
+                    Foundations and Endowments
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Dealroom</div>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏠</span>
+                    Home
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🔍</span>
+                    Search
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">💼</span>
+                    Opportunities
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">✅</span>
+                    Closed
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">People</div>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏠</span>
+                    Home
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">👥</span>
+                    Team
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🔍</span>
+                    Search
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Tools</div>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">📋</span>
+                    Due Diligence
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">⚠️</span>
+                    Risk Analysis
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">📊</span>
+                    Reports
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Premium</div>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🎭</span>
+                    Concierge Services
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏎️</span>
+                    Exclusive Events
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Investment Universe</h1>
+                <p class="page-subtitle">Discover, analyze, and connect with investment opportunities worldwide</p>
+            </div>
+
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-value">20,847</div>
+                    <div class="stat-label">Total Companies</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">$2.3T</div>
+                    <div class="stat-label">Total AUM</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">156</div>
+                    <div class="stat-label">Countries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">847</div>
+                    <div class="stat-label">Active Deals</div>
+                </div>
+            </div>
+
+            <div class="networking-features">
+                <h3 style="margin-bottom: 1rem; color: #3b82f6;">Networking & Exclusive Services</h3>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏎️</div>
+                        <div>Monaco GP Tickets</div>
+                    </div>
+                    <div class="feature-item">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎭</div>
+                        <div>Met Gala Access</div>
+                    </div>
+                    <div class="feature-item">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎬</div>
+                        <div>Cannes Film Festival</div>
+                    </div>
+                    <div class="feature-item">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🤝</div>
+                        <div>Private Networking</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters-container">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" onclick="switchTab('companies')">Companies</button>
+                    <button class="filter-tab" onclick="switchTab('people')">People</button>
+                </div>
+
+                <div id="companies-filters" class="filter-content">
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Search companies, people, or investments...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label class="filter-label">Company Name</label>
+                            <input type="text" class="filter-input" placeholder="Enter company name">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Headquarters</label>
+                            <select class="filter-select">
+                                <option value="">All Locations</option>
+                                <option value="US">United States</option>
+                                <option value="UK">United Kingdom</option>
+                                <option value="SG">Singapore</option>
+                                <option value="CH">Switzerland</option>
+                                <option value="NO">Norway</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Investor Type</label>
+                            <select class="filter-select">
+                                <option value="">All Types</option>
+                                <option value="family-office">Family Office</option>
+                                <option value="investment-bank">Investment Bank</option>
+                                <option value="private-equity">Private Equity</option>
+                                <option value="venture-capital">Venture Capital</option>
+                                <option value="hedge-fund">Hedge Fund</option>
+                                <option value="placement-agent">Placement Agent</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">AUM Range</label>
+                            <select class="filter-select">
+                                <option value="">Any Size</option>
+                                <option value="0-100m">$0-100M</option>
+                                <option value="100m-1b">$100M-1B</option>
+                                <option value="1b-10b">$1B-10B</option>
+                                <option value="10b+">$10B+</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Sectors</label>
+                            <select class="filter-select">
+                                <option value="">All Sectors</option>
+                                <option value="agnostic">Agnostic</option>
+                                <option value="cleantech">CleanTech</option>
+                                <option value="healthcare">Healthcare & Life Sciences</option>
+                                <option value="deeptech">DeepTech</option>
+                                <option value="ai-ml">AI/ML</option>
+                                <option value="industrial">Industrial & Manufacturing</option>
+                                <option value="saas">Software (SaaS, Enterprise)</option>
+                                <option value="b2b-saas">B2B SaaS</option>
+                                <option value="b2c-saas">B2C SaaS</option>
+                                <option value="fintech">FinTech</option>
+                                <option value="climatetech">ClimateTech</option>
+                                <option value="proptech">PropTech</option>
+                                <option value="cybersecurity">Cybersecurity</option>
+                                <option value="blockchain">Blockchain & Crypto</option>
+                                <option value="healthtech">HealthTech</option>
+                                <option value="edtech">EdTech</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Stage</label>
+                            <select class="filter-select">
+                                <option value="">All Stages</option>
+                                <option value="pre-seed">Pre-seed</option>
+                                <option value="series-a">Series A</option>
+                                <option value="series-b">Series B</option>
+                                <option value="series-c">Series C</option>
+                                <option value="series-d">Series D</option>
+                                <option value="growth-capital">Growth Capital</option>
+                                <option value="buyout">Buyout</option>
+                                <option value="debt">Debt</option>
+                                <option value="mezzanine-debt">Mezzanine Debt</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Min Investment Size</label>
+                            <input type="text" class="filter-input" placeholder="e.g., $1M">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Max Investment Size</label>
+                            <input type="text" class="filter-input" placeholder="e.g., $100M">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="people-filters" class="filter-content hidden">
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Search by name, company, or role...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label class="filter-label">First Name</label>
+                            <input type="text" class="filter-input" placeholder="Enter first name">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Last Name</label>
+                            <input type="text" class="filter-input" placeholder="Enter last name">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Role/Title</label>
+                            <select class="filter-select">
+                                <option value="">All Roles</option>
+                                <option value="managing-director">Managing Director</option>
+                                <option value="partner">Partner</option>
+                                <option value="principal">Principal</option>
+                                <option value="vice-president">Vice President</option>
+                                <option value="director">Director</option>
+                                <option value="analyst">Analyst</option>
+                                <option value="ceo">CEO</option>
+                                <option value="cfo">CFO</option>
+                                <option value="cio">CIO</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Email</label>
+                            <input type="email" class="filter-input" placeholder="Enter email">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Location</label>
+                            <select class="filter-select">
+                                <option value="">All Locations</option>
+                                <option value="new-york">New York</option>
+                                <option value="london">London</option>
+                                <option value="singapore">Singapore</option>
+                                <option value="zurich">Zurich</option>
+                                <option value="oslo">Oslo</option>
+                                <option value="dubai">Dubai</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Phone Number</label>
+                            <input type="tel" class="filter-input" placeholder="Enter phone number">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">LinkedIn Connection</label>
+                            <input type="text" class="filter-input" placeholder="Search connections">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-buttons">
+                    <button class="btn btn-secondary">Clear All</button>
+                    <button class="btn btn-primary">Apply Filters</button>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">
+                    <h3 class="table-title">Investment Opportunities</h3>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Type</th>
+                            <th>Sector</th>
+                            <th>AUM</th>
+                            <th>Location</th>
+                            <th>Stage</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Blackstone Group</strong><br><small>Global Alternative Asset Manager</small></td>
+                            <td>Private Equity</td>
+                            <td>Multi-Sector</td>
+                            <td><span class="amount">$975B</span></td>
+                            <td>New York, US</td>
+                            <td>Growth Capital</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sequoia Capital</strong><br><small>Venture Capital Firm</small></td>
+                            <td>Venture Capital</td>
+                            <td>AI/ML</td>
+                            <td><span class="amount">$85B</span></td>
+                            <td>Menlo Park, US</td>
+                            <td>Series A</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rothschild & Co</strong><br><small>Family Office & Private Banking</small></td>
+                            <td>Family Office</td>
+                            <td>Real Estate</td>
+                            <td><span class="amount">$127B</span></td>
+                            <td>London, UK</td>
+                            <td>Buyout</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Andreessen Horowitz</strong><br><small>a16z Venture Capital</small></td>
+                            <td>Venture Capital</td>
+                            <td>Web3</td>
+                            <td><span class="amount">$35B</span></td>
+                            <td>Menlo Park, US</td>
+                            <td>Series C</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>KKR & Co</strong><br><small>Global Investment Firm</small></td>
+                            <td>Private Equity</td>
+                            <td>Healthcare</td>
+                            <td><span class="amount">$504B</span></td>
+                            <td>New York, US</td>
+                            <td>Growth Capital</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>SoftBank Vision Fund</strong><br><small>Technology Investment Fund</small></td>
+                            <td>Investment Fund</td>
+                            <td>AI/ML</td>
+                            <td><span class="amount">$100B</span></td>
+                            <td>Tokyo, Japan</td>
+                            <td>Growth Capital</td>
+                            <td><span class="status-badge status-inactive">Paused</span></td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Monitor</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Bridgewater Associates</strong><br><small>Global Macro Hedge Fund</small></td>
+                            <td>Hedge Fund</td>
+                            <td>Multi-Strategy</td>
+                            <td><span class="amount">$235B</span></td>
+                            <td>Westport, US</td>
+                            <td>Growth Capital</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination">
+                    <button class="pagination-btn">‹‹</button>
+                    <button class="pagination-btn">‹</button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">2</button>
+                    <button class="pagination-btn">3</button>
+                    <button class="pagination-btn">4</button>
+                    <button class="pagination-btn">5</button>
+                    <button class="pagination-btn">›</button>
+                    <button class="pagination-btn">››</button>
+                    <span style="margin-left: 2rem; color: #64748b;">Showing 1-10 of 20,847 results</span>
+                </div>
+            </div>
+
+            <!-- Enhanced Features Section -->
+            <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div class="data-table" style="margin-bottom: 0;">
+                    <div class="table-header">
+                        <h3 class="table-title">🚀 Recent Deal Activity</h3>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(59, 130, 246, 0.1);">
+                            <div style="font-weight: 600; color: #3b82f6; margin-bottom: 0.25rem;">Series B Funding - $50M</div>
+                            <div style="color: #e2e8f0; font-size: 0.9rem;">TechCorp AI → Sequoia Capital</div>
+                            <div style="color: #64748b; font-size: 0.8rem; margin-top: 0.25rem;">2 hours ago</div>
+                        </div>
+                        <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(59, 130, 246, 0.1);">
+                            <div style="font-weight: 600; color: #3b82f6; margin-bottom: 0.25rem;">Growth Capital - $200M</div>
+                            <div style="color: #e2e8f0; font-size: 0.9rem;">CleanEnergy Solutions → Blackstone</div>
+                            <div style="color: #64748b; font-size: 0.8rem; margin-top: 0.25rem;">5 hours ago</div>
+                        </div>
+                        <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(59, 130, 246, 0.1);">
+                            <div style="font-weight: 600; color: #3b82f6; margin-bottom: 0.25rem;">Buyout - $1.2B</div>
+                            <div style="color: #e2e8f0; font-size: 0.9rem;">FinTech Innovators → KKR</div>
+                            <div style="color: #64748b; font-size: 0.8rem; margin-top: 0.25rem;">1 day ago</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-table" style="margin-bottom: 0;">
+                    <div class="table-header">
+                        <h3 class="table-title">🎯 Trending Sectors</h3>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="color: #e2e8f0;">AI/ML</span>
+                                <span style="color: #22c55e; font-weight: 600;">+23%</span>
+                            </div>
+                            <div style="background: rgba(59, 130, 246, 0.2); height: 6px; border-radius: 3px;">
+                                <div style="background: #3b82f6; height: 100%; width: 85%; border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="color: #e2e8f0;">CleanTech</span>
+                                <span style="color: #22c55e; font-weight: 600;">+18%</span>
+                            </div>
+                            <div style="background: rgba(59, 130, 246, 0.2); height: 6px; border-radius: 3px;">
+                                <div style="background: #22c55e; height: 100%; width: 72%; border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="color: #e2e8f0;">HealthTech</span>
+                                <span style="color: #22c55e; font-weight: 600;">+15%</span>
+                            </div>
+                            <div style="background: rgba(59, 130, 246, 0.2); height: 6px; border-radius: 3px;">
+                                <div style="background: #06b6d4; height: 100%; width: 68%; border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="color: #e2e8f0;">Web3</span>
+                                <span style="color: #ef4444; font-weight: 600;">-8%</span>
+                            </div>
+                            <div style="background: rgba(59, 130, 246, 0.2); height: 6px; border-radius: 3px;">
+                                <div style="background: #ef4444; height: 100%; width: 45%; border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRM and Due Diligence Tools -->
+            <div style="margin-top: 2rem;">
+                <div class="data-table">
+                    <div class="table-header">
+                        <h3 class="table-title">🔧 Platform Tools & Features</h3>
+                    </div>
+                    <div style="padding: 2rem;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                            <div style="background: rgba(59, 130, 246, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.2);">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
+                                <h4 style="color: #3b82f6; margin-bottom: 0.5rem;">Advanced Analytics</h4>
+                                <p style="color: #cbd5e1; font-size: 0.9rem;">Real-time portfolio analytics, risk assessment, and performance tracking with AI-powered insights.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Launch Analytics</button>
+                            </div>
+                            
+                            <div style="background: rgba(34, 197, 94, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(34, 197, 94, 0.2);">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">🔍</div>
+                                <h4 style="color: #22c55e; margin-bottom: 0.5rem;">Due Diligence Suite</h4>
+                                <p style="color: #cbd5e1; font-size: 0.9rem;">Streamlined DD processes with document management, compliance tracking, and automated workflows.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%; background: #22c55e;">Start DD Process</button>
+                            </div>
+                            
+                            <div style="background: rgba(168, 85, 247, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(168, 85, 247, 0.2);">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">🤖</div>
+                                <h4 style="color: #a855f7; margin-bottom: 0.5rem;">AI Deal Matching</h4>
+                                <p style="color: #cbd5e1; font-size: 0.9rem;">Intelligent matching algorithm connecting GPs with LPs based on investment thesis and preferences.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%; background: #a855f7;">Explore Matches</button>
+                            </div>
+                            
+                            <div style="background: rgba(239, 68, 68, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">⚠️</div>
+                                <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Risk Management</h4>
+                                <p style="color: #cbd5e1; font-size: 0.9rem;">Comprehensive risk analysis, stress testing, and regulatory compliance monitoring across all assets.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%; background: #ef4444;">View Risk Dashboard</button>
+                            </div>
+                            
+                            <div style="background: rgba(6, 182, 212, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(6, 182, 212, 0.2);">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">📱</div>
+                                <h4 style="color: #06b6d4; margin-bottom: 0.5rem;">LinkedIn Integration</h4>
+                                <p style="color: #cbd5e1; font-size: 0.9rem;">Seamlessly connect with your LinkedIn network and discover warm introductions to key decision makers.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%; background: #06b6d4;">Connect LinkedIn</button>
+                            </div>
+                            
+                            <div style="background: rgba(245, 158, 11, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.2);">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">🎭</div>
+                                <h4 style="color: #f59e0b; margin-bottom: 0.5rem;">Concierge Services</h4>
+                                <p style="color: #cbd5e1; font-size: 0.9rem;">Exclusive access to premium events, private dining, luxury experiences, and personalized hospitality.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%; background: #f59e0b;">View Services</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Hide all filter contents
+            document.querySelectorAll('.filter-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Show corresponding content
+            document.getElementById(tabName + '-filters').classList.remove('hidden');
+        }
+
+        // Add some interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar navigation
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Connect buttons
+            document.querySelectorAll('.btn-primary').forEach(button => {
+                if (button.textContent.includes('Connect')) {
+                    button.addEventListener('click', function() {
+                        this.textContent = 'Connected ✓';
+                        this.style.background = '#22c55e';
+                        setTimeout(() => {
+                            this.textContent = 'Connect';
+                            this.style.background = 'linear-gradient(45deg, #3b82f6, #06b6d4)';
+                        }, 2000);
+                    });
+                }
+            });
+
+            // Search functionality
+            document.querySelectorAll('.search-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    // Simulate search functionality
+                    console.log('Searching for:', this.value);
+                });
+            });
+
+            // Filter functionality
+            document.querySelectorAll('.filter-select, .filter-input').forEach(filter => {
+                filter.addEventListener('change', function() {
+                    // Simulate filtering
+                    console.log('Filter changed:', this.value);
+                });
+            });
+
+            // Pagination
+            document.querySelectorAll('.pagination-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.pagination-btn').forEach(b => b.classList.remove('active'));
+                    if (!isNaN(this.textContent)) {
+                        this.classList.add('active');
+                    }
+                });
+            });
+
+            // Add hover effects to table rows
+            document.querySelectorAll('.table tbody tr').forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.01)';
+                    this.style.transition = 'all 0.2s ease';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // Add notification system for premium features
+            document.querySelectorAll('.feature-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    // Create notification
+                    const notification = document.createElement('div');
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 2rem;
+                        right: 2rem;
+                        background: linear-gradient(45deg, #3b82f6, #06b6d4);
+                        color: white;
+                        padding: 1rem 2rem;
+                        border-radius: 12px;
+                        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+                        z-index: 10000;
+                        animation: slideIn 0.3s ease;
+                    `;
+                    notification.textContent = 'Premium feature - Upgrade to access exclusive events!';
+                    document.body.appendChild(notification);
+
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
+                });
+            });
+        });
+    </script>
+
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</body>
+</html></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Temasek Holdings</strong><br><small>Singapore Sovereign Wealth Fund</small></td>
+                            <td>Sovereign Wealth</td>
+                            <td>Technology</td>
+                            <td><span class="amount">$382B</span></td>
+                            <td>Singapore</td>
+                            <td>Growth Capital</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Goldman Sachs AM</strong><br><small>Asset Management Division</small></td>
+                            <td>Investment Bank</td>
+                            <td>FinTech</td>
+                            <td><span class="amount">$2.1T</span></td>
+                            <td>New York, US</td>
+                            <td>Series B</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Norway SWF</strong><br><small>Government Pension Fund Global</small></td>
+                            <td>Sovereign Wealth</td>
+                            <td>CleanTech</td>
+                            <td><span class="amount">$1.6T</span></td>
+                            <td>Oslo, Norway</td>
+                            <td>Growth Capital</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AssetConnect Pro - Portfolio Management Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: rgba(15, 20, 25, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-items {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-item {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: rgba(15, 20, 25, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(59, 130, 246, 0.1);
+            padding: 2rem 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border-left-color: #3b82f6;
+        }
+
+        .sidebar-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            opacity: 0.7;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .filters-container {
+            background: rgba(15, 20, 25, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .filter-tab {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .filter-tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            color: #cbd5e1;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .filter-input, .filter-select {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-select option {
+            background: #1e293b;
+            color: #ffffff;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #3b82f6, #06b6d4);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .data-table {
+            background: rgba(15, 20, 25, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: rgba(30, 41, 59, 0.8);
+            color: #cbd5e1;
+            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            font-size: 0.9rem;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            color: #e2e8f0;
+        }
+
+        .table tr:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .amount {
+            font-weight: 600;
+            color: #3b82f6;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 2rem;
+            background: rgba(15, 20, 25, 0.6);
+        }
+
+        .pagination-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 6px;
+            color: #3b82f6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover, .pagination-btn.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(15, 20, 25, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem;
+            padding-left: 3rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        .networking-features {
+            background: rgba(15, 20, 25, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .feature-item {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">AssetConnect Pro</div>
+        <div class="nav-items">
+            <a href="#" class="nav-item active">Dashboard</a>
+            <a href="#" class="nav-item">Portfolio</a>
+            <a href="#" class="nav-item">Analytics</a>
+            <a href="#" class="nav-item">Network</a>
+            <a href="#" class="nav-item">Events</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Home</div>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏠</span>
+                    Home
+                </a>
+                <a href="#" class="sidebar-item active">
+                    <span class="sidebar-icon">📊</span>
+                    Dashboard
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Entities</div>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏠</span>
+                    Home
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏦</span>
+                    Family Offices
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">⭐</span>
+                    Startup Angels & Syndicates
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🚀</span>
+                    Incubators & Accelerators
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">💰</span>
+                    Venture Capital Funds
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏢</span>
+                    Private Equity Funds
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">📈</span>
+                    Funds of Funds
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">📊</span>
+                    Hedge Funds
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏛️</span>
+                    Private Banking
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏦</span>
+                    Investment Banks
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">💎</span>
+                    Wealth Management
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🤝</span>
+                    Fund Placement Agencies
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏛️</span>
+                    Foundations and Endowments
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Dealroom</div>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏠</span>
+                    Home
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🔍</span>
+                    Search
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">💼</span>
+                    Opportunities
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">✅</span>
+                    Closed
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">People</div>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏠</span>
+                    Home
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">👥</span>
+                    Team
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🔍</span>
+                    Search
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Tools</div>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">📋</span>
+                    Due Diligence
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">⚠️</span>
+                    Risk Analysis
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">📊</span>
+                    Reports
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Premium</div>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🎭</span>
+                    Concierge Services
+                </a>
+                <a href="#" class="sidebar-item">
+                    <span class="sidebar-icon">🏎️</span>
+                    Exclusive Events
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Investment Universe</h1>
+                <p class="page-subtitle">Discover, analyze, and connect with investment opportunities worldwide</p>
+            </div>
+
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-value">20,847</div>
+                    <div class="stat-label">Total Companies</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">$2.3T</div>
+                    <div class="stat-label">Total AUM</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">156</div>
+                    <div class="stat-label">Countries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">847</div>
+                    <div class="stat-label">Active Deals</div>
+                </div>
+            </div>
+
+            <div class="networking-features">
+                <h3 style="margin-bottom: 1rem; color: #3b82f6;">Networking & Exclusive Services</h3>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏎️</div>
+                        <div>Monaco GP Tickets</div>
+                    </div>
+                    <div class="feature-item">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎭</div>
+                        <div>Met Gala Access</div>
+                    </div>
+                    <div class="feature-item">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎬</div>
+                        <div>Cannes Film Festival</div>
+                    </div>
+                    <div class="feature-item">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🤝</div>
+                        <div>Private Networking</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters-container">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" onclick="switchTab('companies')">Companies</button>
+                    <button class="filter-tab" onclick="switchTab('people')">People</button>
+                </div>
+
+                <div id="companies-filters" class="filter-content">
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Search companies, people, or investments...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label class="filter-label">Company Name</label>
+                            <input type="text" class="filter-input" placeholder="Enter company name">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Headquarters</label>
+                            <select class="filter-select">
+                                <option value="">All Locations</option>
+                                <option value="US">United States</option>
+                                <option value="UK">United Kingdom</option>
+                                <option value="SG">Singapore</option>
+                                <option value="CH">Switzerland</option>
+                                <option value="NO">Norway</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Investor Type</label>
+                            <select class="filter-select">
+                                <option value="">All Types</option>
+                                <option value="family-office">Family Office</option>
+                                <option value="investment-bank">Investment Bank</option>
+                                <option value="private-equity">Private Equity</option>
+                                <option value="venture-capital">Venture Capital</option>
+                                <option value="hedge-fund">Hedge Fund</option>
+                                <option value="placement-agent">Placement Agent</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">AUM Range</label>
+                            <select class="filter-select">
+                                <option value="">Any Size</option>
+                                <option value="0-100m">$0-100M</option>
+                                <option value="100m-1b">$100M-1B</option>
+                                <option value="1b-10b">$1B-10B</option>
+                                <option value="10b+">$10B+</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Sectors</label>
+                            <select class="filter-select">
+                                <option value="">All Sectors</option>
+                                <option value="agnostic">Agnostic</option>
+                                <option value="cleantech">CleanTech</option>
+                                <option value="healthcare">Healthcare & Life Sciences</option>
+                                <option value="deeptech">DeepTech</option>
+                                <option value="ai-ml">AI/ML</option>
+                                <option value="industrial">Industrial & Manufacturing</option>
+                                <option value="saas">Software (SaaS, Enterprise)</option>
+                                <option value="b2b-saas">B2B SaaS</option>
+                                <option value="b2c-saas">B2C SaaS</option>
+                                <option value="fintech">FinTech</option>
+                                <option value="climatetech">ClimateTech</option>
+                                <option value="proptech">PropTech</option>
+                                <option value="cybersecurity">Cybersecurity</option>
+                                <option value="blockchain">Blockchain & Crypto</option>
+                                <option value="healthtech">HealthTech</option>
+                                <option value="edtech">EdTech</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Stage</label>
+                            <select class="filter-select">
+                                <option value="">All Stages</option>
+                                <option value="pre-seed">Pre-seed</option>
+                                <option value="series-a">Series A</option>
+                                <option value="series-b">Series B</option>
+                                <option value="series-c">Series C</option>
+                                <option value="series-d">Series D</option>
+                                <option value="growth-capital">Growth Capital</option>
+                                <option value="buyout">Buyout</option>
+                                <option value="debt">Debt</option>
+                                <option value="mezzanine-debt">Mezzanine Debt</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Min Investment Size</label>
+                            <input type="text" class="filter-input" placeholder="e.g., $1M">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Max Investment Size</label>
+                            <input type="text" class="filter-input" placeholder="e.g., $100M">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="people-filters" class="filter-content hidden">
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Search by name, company, or role...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label class="filter-label">First Name</label>
+                            <input type="text" class="filter-input" placeholder="Enter first name">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Last Name</label>
+                            <input type="text" class="filter-input" placeholder="Enter last name">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Role/Title</label>
+                            <select class="filter-select">
+                                <option value="">All Roles</option>
+                                <option value="managing-director">Managing Director</option>
+                                <option value="partner">Partner</option>
+                                <option value="principal">Principal</option>
+                                <option value="vice-president">Vice President</option>
+                                <option value="director">Director</option>
+                                <option value="analyst">Analyst</option>
+                                <option value="ceo">CEO</option>
+                                <option value="cfo">CFO</option>
+                                <option value="cio">CIO</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Email</label>
+                            <input type="email" class="filter-input" placeholder="Enter email">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Location</label>
+                            <select class="filter-select">
+                                <option value="">All Locations</option>
+                                <option value="new-york">New York</option>
+                                <option value="london">London</option>
+                                <option value="singapore">Singapore</option>
+                                <option value="zurich">Zurich</option>
+                                <option value="oslo">Oslo</option>
+                                <option value="dubai">Dubai</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Phone Number</label>
+                            <input type="tel" class="filter-input" placeholder="Enter phone number">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">LinkedIn Connection</label>
+                            <input type="text" class="filter-input" placeholder="Search connections">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-buttons">
+                    <button class="btn btn-secondary">Clear All</button>
+                    <button class="btn btn-primary">Apply Filters</button>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">
+                    <h3 class="table-title">Investment Opportunities</h3>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Type</th>
+                            <th>Sector</th>
+                            <th>AUM</th>
+                            <th>Location</th>
+                            <th>Stage</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Blackstone Group</strong><br><small>Global Alternative Asset Manager</small></td>
+                            <td>Private Equity</td>
+                            <td>Multi-Sector</td>
+                            <td><span class="amount">$975B</span></td>
+                            <td>New York, US</td>
+                            <td>Growth Capital</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sequoia Capital</strong><br><small>Venture Capital Firm</small></td>
+                            <td>Venture Capital</td>
+                            <td>AI/ML</td>
+                            <td><span class="amount">$85B</span></td>
+                            <td>Menlo Park, US</td>
+                            <td>Series A</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rothschild & Co</strong><br><small>Family Office & Private Banking</small></td>
+                            <td>Family Office</td>
+                            <td>Real Estate</td>
+                            <td><span class="amount">$127B</span></td>
+                            <td>London, UK</td>
+                            <td>Buyout</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Andreessen Horowitz</strong><br><small>a16z Venture Capital</small></td>
+                            <td>Venture Capital</td>
+                            <td>Web3</td>
+                            <td><span class="amount">$35B</span></td>
+                            <td>Menlo Park, US</td>
+                            <td>Series C</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>KKR & Co</strong><br><small>Global Investment Firm</small></td>
+                            <td>Private Equity</td>
+                            <td>Healthcare</td>
+                            <td><span class="amount">$504B</span></td>
+                            <td>New York, US</td>
+                            <td>Growth Capital</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>SoftBank Vision Fund</strong><br><small>Technology Investment Fund</small></td>
+                            <td>Investment Fund</td>
+                            <td>AI/ML</td>
+                            <td><span class="amount">$100B</span></td>
+                            <td>Tokyo, Japan</td>
+                            <td>Growth Capital</td>
+                            <td><span class="status-badge status-inactive">Paused</span></td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Monitor</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Bridgewater Associates</strong><br><small>Global Macro Hedge Fund</small></td>
+                            <td>Hedge Fund</td>
+                            <td>Multi-Strategy</td>
+                            <td><span class="amount">$235B</span></td>
+                            <td>Westport, US</td>
+                            <td>Growth Capital</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination">
+                    <button class="pagination-btn">‹‹</button>
+                    <button class="pagination-btn">‹</button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">2</button>
+                    <button class="pagination-btn">3</button>
+                    <button class="pagination-btn">4</button>
+                    <button class="pagination-btn">5</button>
+                    <button class="pagination-btn">›</button>
+                    <button class="pagination-btn">››</button>
+                    <span style="margin-left: 2rem; color: #64748b;">Showing 1-10 of 20,847 results</span>
+                </div>
+            </div>
+
+            <!-- Enhanced Features Section -->
+            <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div class="data-table" style="margin-bottom: 0;">
+                    <div class="table-header">
+                        <h3 class="table-title">🚀 Recent Deal Activity</h3>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(59, 130, 246, 0.1);">
+                            <div style="font-weight: 600; color: #3b82f6; margin-bottom: 0.25rem;">Series B Funding - $50M</div>
+                            <div style="color: #e2e8f0; font-size: 0.9rem;">TechCorp AI → Sequoia Capital</div>
+                            <div style="color: #64748b; font-size: 0.8rem; margin-top: 0.25rem;">2 hours ago</div>
+                        </div>
+                        <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(59, 130, 246, 0.1);">
+                            <div style="font-weight: 600; color: #3b82f6; margin-bottom: 0.25rem;">Growth Capital - $200M</div>
+                            <div style="color: #e2e8f0; font-size: 0.9rem;">CleanEnergy Solutions → Blackstone</div>
+                            <div style="color: #64748b; font-size: 0.8rem; margin-top: 0.25rem;">5 hours ago</div>
+                        </div>
+                        <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(59, 130, 246, 0.1);">
+                            <div style="font-weight: 600; color: #3b82f6; margin-bottom: 0.25rem;">Buyout - $1.2B</div>
+                            <div style="color: #e2e8f0; font-size: 0.9rem;">FinTech Innovators → KKR</div>
+                            <div style="color: #64748b; font-size: 0.8rem; margin-top: 0.25rem;">1 day ago</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-table" style="margin-bottom: 0;">
+                    <div class="table-header">
+                        <h3 class="table-title">🎯 Trending Sectors</h3>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="color: #e2e8f0;">AI/ML</span>
+                                <span style="color: #22c55e; font-weight: 600;">+23%</span>
+                            </div>
+                            <div style="background: rgba(59, 130, 246, 0.2); height: 6px; border-radius: 3px;">
+                                <div style="background: #3b82f6; height: 100%; width: 85%; border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="color: #e2e8f0;">CleanTech</span>
+                                <span style="color: #22c55e; font-weight: 600;">+18%</span>
+                            </div>
+                            <div style="background: rgba(59, 130, 246, 0.2); height: 6px; border-radius: 3px;">
+                                <div style="background: #22c55e; height: 100%; width: 72%; border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="color: #e2e8f0;">HealthTech</span>
+                                <span style="color: #22c55e; font-weight: 600;">+15%</span>
+                            </div>
+                            <div style="background: rgba(59, 130, 246, 0.2); height: 6px; border-radius: 3px;">
+                                <div style="background: #06b6d4; height: 100%; width: 68%; border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="color: #e2e8f0;">Web3</span>
+                                <span style="color: #ef4444; font-weight: 600;">-8%</span>
+                            </div>
+                            <div style="background: rgba(59, 130, 246, 0.2); height: 6px; border-radius: 3px;">
+                                <div style="background: #ef4444; height: 100%; width: 45%; border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRM and Due Diligence Tools -->
+            <div style="margin-top: 2rem;">
+                <div class="data-table">
+                    <div class="table-header">
+                        <h3 class="table-title">🔧 Platform Tools & Features</h3>
+                    </div>
+                    <div style="padding: 2rem;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                            <div style="background: rgba(59, 130, 246, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.2);">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
+                                <h4 style="color: #3b82f6; margin-bottom: 0.5rem;">Advanced Analytics</h4>
+                                <p style="color: #cbd5e1; font-size: 0.9rem;">Real-time portfolio analytics, risk assessment, and performance tracking with AI-powered insights.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Launch Analytics</button>
+                            </div>
+                            
+                            <div style="background: rgba(34, 197, 94, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(34, 197, 94, 0.2);">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">🔍</div>
+                                <h4 style="color: #22c55e; margin-bottom: 0.5rem;">Due Diligence Suite</h4>
+                                <p style="color: #cbd5e1; font-size: 0.9rem;">Streamlined DD processes with document management, compliance tracking, and automated workflows.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%; background: #22c55e;">Start DD Process</button>
+                            </div>
+                            
+                            <div style="background: rgba(168, 85, 247, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(168, 85, 247, 0.2);">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">🤖</div>
+                                <h4 style="color: #a855f7; margin-bottom: 0.5rem;">AI Deal Matching</h4>
+                                <p style="color: #cbd5e1; font-size: 0.9rem;">Intelligent matching algorithm connecting GPs with LPs based on investment thesis and preferences.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%; background: #a855f7;">Explore Matches</button>
+                            </div>
+                            
+                            <div style="background: rgba(239, 68, 68, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">⚠️</div>
+                                <h4 style="color: #ef4444; margin-bottom: 0.5rem;">Risk Management</h4>
+                                <p style="color: #cbd5e1; font-size: 0.9rem;">Comprehensive risk analysis, stress testing, and regulatory compliance monitoring across all assets.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%; background: #ef4444;">View Risk Dashboard</button>
+                            </div>
+                            
+                            <div style="background: rgba(6, 182, 212, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(6, 182, 212, 0.2);">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">📱</div>
+                                <h4 style="color: #06b6d4; margin-bottom: 0.5rem;">LinkedIn Integration</h4>
+                                <p style="color: #cbd5e1; font-size: 0.9rem;">Seamlessly connect with your LinkedIn network and discover warm introductions to key decision makers.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%; background: #06b6d4;">Connect LinkedIn</button>
+                            </div>
+                            
+                            <div style="background: rgba(245, 158, 11, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.2);">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">🎭</div>
+                                <h4 style="color: #f59e0b; margin-bottom: 0.5rem;">Concierge Services</h4>
+                                <p style="color: #cbd5e1; font-size: 0.9rem;">Exclusive access to premium events, private dining, luxury experiences, and personalized hospitality.</p>
+                                <button class="btn btn-primary" style="margin-top: 1rem; width: 100%; background: #f59e0b;">View Services</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Hide all filter contents
+            document.querySelectorAll('.filter-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Show corresponding content
+            document.getElementById(tabName + '-filters').classList.remove('hidden');
+        }
+
+        // Add some interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar navigation
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Connect buttons
+            document.querySelectorAll('.btn-primary').forEach(button => {
+                if (button.textContent.includes('Connect')) {
+                    button.addEventListener('click', function() {
+                        this.textContent = 'Connected ✓';
+                        this.style.background = '#22c55e';
+                        setTimeout(() => {
+                            this.textContent = 'Connect';
+                            this.style.background = 'linear-gradient(45deg, #3b82f6, #06b6d4)';
+                        }, 2000);
+                    });
+                }
+            });
+
+            // Search functionality
+            document.querySelectorAll('.search-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    // Simulate search functionality
+                    console.log('Searching for:', this.value);
+                });
+            });
+
+            // Filter functionality
+            document.querySelectorAll('.filter-select, .filter-input').forEach(filter => {
+                filter.addEventListener('change', function() {
+                    // Simulate filtering
+                    console.log('Filter changed:', this.value);
+                });
+            });
+
+            // Pagination
+            document.querySelectorAll('.pagination-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.pagination-btn').forEach(b => b.classList.remove('active'));
+                    if (!isNaN(this.textContent)) {
+                        this.classList.add('active');
+                    }
+                });
+            });
+
+            // Add hover effects to table rows
+            document.querySelectorAll('.table tbody tr').forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.01)';
+                    this.style.transition = 'all 0.2s ease';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // Add notification system for premium features
+            document.querySelectorAll('.feature-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    // Create notification
+                    const notification = document.createElement('div');
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 2rem;
+                        right: 2rem;
+                        background: linear-gradient(45deg, #3b82f6, #06b6d4);
+                        color: white;
+                        padding: 1rem 2rem;
+                        border-radius: 12px;
+                        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+                        z-index: 10000;
+                        animation: slideIn 0.3s ease;
+                    `;
+                    notification.textContent = 'Premium feature - Upgrade to access exclusive events!';
+                    document.body.appendChild(notification);
+
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
+                });
+            });
+        });
+    </script>
+
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</body>
+</html></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Temasek Holdings</strong><br><small>Singapore Sovereign Wealth Fund</small></td>
+                            <td>Sovereign Wealth</td>
+                            <td>Technology</td>
+                            <td><span class="amount">$382B</span></td>
+                            <td>Singapore</td>
+                            <td>Growth Capital</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Goldman Sachs AM</strong><br><small>Asset Management Division</small></td>
+                            <td>Investment Bank</td>
+                            <td>FinTech</td>
+                            <td><span class="amount">$2.1T</span></td>
+                            <td>New York, US</td>
+                            <td>Series B</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Norway SWF</strong><br><small>Government Pension Fund Global</small></td>
+                            <td>Sovereign Wealth</td>
+                            <td>CleanTech</td>
+                            <td><span class="amount">$1.6T</span></td>
+                            <td>Oslo, Norway</td>
+                            <td>Growth Capital</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Connect
+
