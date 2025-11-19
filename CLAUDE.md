@@ -23,6 +23,7 @@
 ```
 /analysis
 ├── CLAUDE.md                              # This file - savepoint doc
+├── TODO.md                                # Implementation requirements ⚠️
 ├── data.csv                               # 544 clean records (154KB) ⭐
 │
 ├── scripts/                               # Core scripts
@@ -328,22 +329,45 @@ Each stage returns:
 
 ---
 
+## Next Steps & TODO
+
+⚠️ **See `TODO.md` for detailed implementation requirements** ⚠️
+
+### Critical Missing Features:
+
+1. **Parallel Processing** ❌
+   - Current: Sequential (1 record at a time)
+   - Needed: ThreadPoolExecutor with max_workers=20
+   - Impact: 20x faster processing (10-15 min vs 2-3 hours)
+
+2. **Graceful Resumability** ❌
+   - Current: No checkpoint system
+   - Needed: Save progress, resume from interruption
+   - Impact: Can stop/restart without losing progress
+
+**Action Required:** Build `run_production_enrichment.py` with these features
+**Estimated Time:** 1-2 hours implementation + 30 min testing
+**Details:** See `TODO.md` for complete specifications
+
+---
+
 ## Resume Points
 
 **If continuing later:**
 
 1. **Where we left off:** Multi-stage system built and tested, ready for Phase 1
-2. **What to do next:** Create production enrichment runner script
+2. **What to do next:** Build production runner (see `TODO.md`)
 3. **Key files to review:**
-   - `scripts/multi_stage_enrichment.py` (main system)
-   - `docs/gemini-grounding-learnings.md` (discoveries)
+   - `scripts/multi_stage_enrichment.py` (core enrichment system)
+   - `docs/gemini-grounding-learnings.md` (API discoveries)
+   - `TODO.md` (implementation requirements) ⭐
 4. **Data ready:** `data.csv` (544 clean records)
 5. **API key:** Already set in environment
 
-**Questions to resolve:**
-- Should we run Phase 1 now or wait for approval?
-- Want to test Stage 3 (deep research) on samples first?
-- Any schema changes needed before full run?
+**Before running Phase 1:**
+- ✅ Multi-stage system tested and working
+- ❌ Production runner with parallel + resumability (see TODO.md)
+- ❌ Test run with 10 records first
 
 ---
 
