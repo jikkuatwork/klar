@@ -22,25 +22,27 @@
 
 ```
 /analysis
-├── CLAUDE.md                              # This file
-├── data.csv                               # 544 clean records (154KB)
+├── CLAUDE.md                              # This file - savepoint doc
+├── data.csv                               # 544 clean records (154KB) ⭐
 │
-├── scripts/
-│   ├── export_clean_data.py              # CSV export with strict validation
-│   ├── test_gemini_enrichment.py         # Simple URL enrichment test
-│   ├── test_comprehensive_enrichment.py   # Full enrichment test (single-stage)
-│   └── multi_stage_enrichment.py          # Production multi-stage system ⭐
+├── scripts/                               # Core scripts
+│   ├── export_clean_data.py              # Exports clean CSV from Excel
+│   ├── multi_stage_enrichment.py         # Production enrichment system ⭐
+│   ├── test_comprehensive_enrichment.py   # Single-stage reference
+│   └── test_gemini_enrichment.py          # Simple enrichment reference
 │
-├── docs/
+├── docs/                                  # Enrichment documentation ⭐
 │   ├── multi-stage-enrichment-guide.md    # Complete usage guide
-│   ├── single-vs-multi-stage-comparison.md # Test results analysis
-│   └── gemini-grounding-learnings.md      # API discoveries & insights
+│   ├── single-vs-multi-stage-comparison.md # Test results & recommendations
+│   └── gemini-grounding-learnings.md      # API discoveries & next steps
 │
-├── koder/                                 # Original materials (reference)
-│   ├── rough.md                           # Requirements
-│   └── docs/CRM.xlsx                      # Source data (6,528 records)
+├── test_results/                          # Test outputs (for reference)
+│   ├── multi_stage_test_results.json      # Multi-stage test data
+│   └── test_enrichment_samples.json       # Single-stage test data
 │
-└── outputs/                               # Analysis reports (archived)
+└── koder/                                 # Original materials (reference only)
+    ├── rough.md                           # Original requirements
+    └── docs/CRM.xlsx                      # Source Excel (6,528 records)
 ```
 
 ---
