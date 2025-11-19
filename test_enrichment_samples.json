@@ -1,0 +1,308 @@
+[
+  {
+    "original": {
+      "fund.title": "21 North Advisors",
+      "fund.type": "Family Office",
+      "poc.first_name": "Laurent",
+      "poc.last_name": "Hopman",
+      "poc.role": "",
+      "poc.email": "lhopman@21n39e.com",
+      "fund.email": "",
+      "fund.website": "",
+      "fund.country": "Bahrain",
+      "fund.city": "Manama",
+      "fund.sectors": "",
+      "fund.preferred_stage": "",
+      "poc.linkedin": "",
+      "fund.crunchbase": "",
+      "fund.linkedin": "",
+      "poc.phone": "",
+      "fund.phone": ""
+    },
+    "enriched": {
+      "fund.title": "21 North Advisors",
+      "fund.type": "Family Office",
+      "poc.first_name": "Laurent",
+      "poc.last_name": "Hopman",
+      "poc.role": "Founder & CEO",
+      "poc.email": "lhopman@21n39e.com",
+      "poc.description": "Founder and CEO of 21 North Advisors, a Bahrain-based multi-family office established in 2008. He has over 27 years of experience in finance, with previous roles at Investcorp, Sivest, Morgan Stanley, and UBS. He holds an MBA from Wharton and a degree from Ecole Centrale Paris.",
+      "fund.email": "info@21n39e.com",
+      "fund.website": "http://www.21northadvisors.com",
+      "fund.country": "Bahrain",
+      "fund.city": "Manama",
+      "fund.sectors": [
+        "private-equity",
+        "venture-capital",
+        "real-estate",
+        "infrastructure",
+        "hedge-funds"
+      ],
+      "fund.preferred_stage": null,
+      "poc.linkedin": null,
+      "fund.crunchbase": null,
+      "fund.linkedin": null,
+      "poc.phone": "+973 77 21 21 21",
+      "fund.phone": "+973 77 21 21 21",
+      "_enrichment_meta": {
+        "confidence": "high",
+        "fields_added": [
+          "poc.role",
+          "poc.description",
+          "fund.email",
+          "fund.website",
+          "fund.sectors",
+          "poc.phone",
+          "fund.phone"
+        ],
+        "fields_corrected": [],
+        "notes": "Verified company website as 21northadvisors.com (email domain is 21n39e.com). Confirmed role and background via multiple financial profiles (Preqin, Pitchbook, Investors Capital). Sectors sourced from Preqin profile listing PE, VC, RE, INF, HF. LinkedIn URLs could not be verified with high confidence due to name collision with a famous author."
+      }
+    },
+    "tokens": 10070
+  },
+  {
+    "original": {
+      "fund.title": "1919 Investment Counsel",
+      "fund.type": "Investment Advisor",
+      "poc.first_name": "Brett",
+      "poc.last_name": "Kozloski",
+      "poc.role": "Vice President, Senior Business Systems Analyst",
+      "poc.email": "bkozloski@1919ic.com",
+      "fund.email": "info@1919ic.com",
+      "fund.website": "http://www.1919ic.com",
+      "fund.country": "United States",
+      "fund.city": "Baltimore",
+      "fund.sectors": "",
+      "fund.preferred_stage": "",
+      "poc.linkedin": "http://www.linkedin.com/in/brett-p-kozloski-87630444",
+      "fund.crunchbase": "",
+      "fund.linkedin": "https://www.linkedin.com/in/lilyjoo/",
+      "poc.phone": "",
+      "fund.phone": ""
+    },
+    "enriched": {
+      "fund.title": "1919 Investment Counsel",
+      "fund.type": "Investment Advisor",
+      "poc.first_name": "Brett",
+      "poc.last_name": "Kozloski",
+      "poc.role": "Vice President, Senior Business Systems Analyst",
+      "poc.email": "bkozloski@1919ic.com",
+      "poc.description": "Brett Kozloski serves as Vice President and Senior Business Systems Analyst at 1919 Investment Counsel, based in Baltimore. In this capacity, he focuses on the analysis, optimization, and management of business systems to support the firm's investment operations and client service capabilities.",
+      "fund.email": "info@1919ic.com",
+      "fund.website": "https://1919ic.com",
+      "fund.country": "United States",
+      "fund.city": "Baltimore",
+      "fund.sectors": [
+        "private-equity",
+        "hedge-funds",
+        "real-estate",
+        "technology",
+        "healthcare",
+        "consumer",
+        "energy"
+      ],
+      "fund.preferred_stage": null,
+      "poc.linkedin": "http://www.linkedin.com/in/brett-p-kozloski-87630444",
+      "fund.crunchbase": null,
+      "fund.linkedin": "https://www.linkedin.com/company/1919-investment-counsel",
+      "poc.phone": null,
+      "fund.phone": "+1-410-454-2171",
+      "_enrichment_meta": {
+        "confidence": "high",
+        "fields_added": [
+          "fund.linkedin",
+          "fund.sectors",
+          "poc.description",
+          "fund.phone"
+        ],
+        "fields_corrected": [
+          "fund.website",
+          "fund.linkedin"
+        ],
+        "notes": "Verified company details, including correct LinkedIn page and investment sectors (equity, fixed income, and alternatives like PE/Real Estate). Confirmed Brett Kozloski's role as VP, Senior Business Systems Analyst at the Baltimore HQ, distinct from a similarly named individual at GW&K. Generated description based on confirmed role."
+      }
+    },
+    "tokens": 11786
+  },
+  {
+    "original": {
+      "fund.title": "1875 Finance SA",
+      "fund.type": "Multi-Family Wealth Management Firm",
+      "poc.first_name": "Aksel",
+      "poc.last_name": "Azrac",
+      "poc.role": "Senior Partner",
+      "poc.email": "",
+      "fund.email": "info@1875.ch",
+      "fund.website": "https://1875.ch/",
+      "fund.country": "Switzerland",
+      "fund.city": "Gen\u00e8ve",
+      "fund.sectors": "",
+      "fund.preferred_stage": "",
+      "poc.linkedin": "",
+      "fund.crunchbase": "https://www.crunchbase.com/organization/1875-finance",
+      "fund.linkedin": "https://www.linkedin.com/company/1875-finance-sa/",
+      "poc.phone": "",
+      "fund.phone": "+41 22 595 18 75"
+    },
+    "enriched": {
+      "fund.title": "1875 Finance SA",
+      "fund.type": "Multi-Family Wealth Management Firm",
+      "poc.first_name": "Aksel",
+      "poc.last_name": "Azrac",
+      "poc.role": "Senior Partner",
+      "poc.email": null,
+      "poc.description": "Aksel Azrac is a Co-founder and Senior Partner at 1875 Finance, a leading multi-family office based in Geneva. With over 25 years of experience in wealth management and private banking, he previously served on the Executive Board of Banque Ferrier Lullin & Cie and co-managed funds at Banque Paribas (Suisse) SA. He specializes in multi-family office services, asset management, and strategic investment advice for ultra-high-net-worth individuals and families.",
+      "fund.email": "info@1875.ch",
+      "fund.website": "https://1875.ch",
+      "fund.country": "Switzerland",
+      "fund.city": "Gen\u00e8ve",
+      "fund.sectors": [
+        "private-equity",
+        "real-estate",
+        "venture-capital"
+      ],
+      "fund.preferred_stage": null,
+      "poc.linkedin": null,
+      "fund.crunchbase": "https://www.crunchbase.com/organization/1875-finance",
+      "fund.linkedin": "https://www.linkedin.com/company/1875-finance-sa/",
+      "poc.phone": null,
+      "fund.phone": "+41 22 595 18 75",
+      "_enrichment_meta": {
+        "confidence": "high",
+        "fields_added": [
+          "poc.description",
+          "fund.sectors"
+        ],
+        "fields_corrected": [
+          "fund.website"
+        ],
+        "notes": "Created professional bio for Aksel Azrac based on company profile and career history. Mapped investment activities to standardized sectors (Private Equity, Real Estate, Venture Capital). Confirmed company details and location. Unable to verify personal email or personal LinkedIn URL with high confidence."
+      }
+    },
+    "tokens": 6347
+  },
+  {
+    "original": {
+      "fund.title": "1875 Finance SA",
+      "fund.type": "Multi-Family Wealth Management Firm",
+      "poc.first_name": "Aksel",
+      "poc.last_name": "Azrac",
+      "poc.role": "Senior Partner",
+      "poc.email": "",
+      "fund.email": "info@1875.ch",
+      "fund.website": "https://1875.ch/",
+      "fund.country": "Switzerland",
+      "fund.city": "Gen\u00e8ve",
+      "fund.sectors": "",
+      "fund.preferred_stage": "",
+      "poc.linkedin": "",
+      "fund.crunchbase": "https://www.crunchbase.com/organization/1875-finance",
+      "fund.linkedin": "https://www.linkedin.com/company/1875-finance-sa/",
+      "poc.phone": "",
+      "fund.phone": "+41 22 595 18 75"
+    },
+    "enriched": {
+      "fund.title": "1875 Finance SA",
+      "fund.type": "Multi-Family Wealth Management Firm",
+      "poc.first_name": "Aksel",
+      "poc.last_name": "Azrac",
+      "poc.role": "Senior Partner",
+      "poc.email": null,
+      "poc.description": "Co-founder, Partner, and Head of the Multi-Family Office at 1875 Finance, an independent wealth manager based in Geneva. He previously served as a member of the Executive Board at Ferrier Lullin & Cie and managed funds at Paribas (Suisse) SA. He holds degrees from the University of Lausanne and EPFL.",
+      "fund.email": "info@1875.ch",
+      "fund.website": "https://1875.ch",
+      "fund.country": "Switzerland",
+      "fund.city": "Geneva",
+      "fund.sectors": [
+        "private-equity",
+        "venture-capital",
+        "real-estate",
+        "hedge-funds",
+        "crypto-blockchain",
+        "healthcare"
+      ],
+      "fund.preferred_stage": null,
+      "poc.linkedin": null,
+      "fund.crunchbase": "https://www.crunchbase.com/organization/1875-finance",
+      "fund.linkedin": "https://www.linkedin.com/company/1875-finance-sa/",
+      "poc.phone": null,
+      "fund.phone": "+41 22 595 18 75",
+      "_enrichment_meta": {
+        "confidence": "high",
+        "fields_added": [
+          "poc.description",
+          "fund.sectors",
+          "fund.city"
+        ],
+        "fields_corrected": [
+          "fund.website"
+        ],
+        "notes": "Constructed professional bio for Aksel Azrac based on company profile and public biography. Mapped investment sectors to standardized list based on firm's multi-family office activities and public profiles. Confirmed Geneva location. Removed trailing slash from website."
+      }
+    },
+    "tokens": 5843
+  },
+  {
+    "original": {
+      "fund.title": "21 North Advisors",
+      "fund.type": "Family Office",
+      "poc.first_name": "Laurent",
+      "poc.last_name": "Hopman",
+      "poc.role": "",
+      "poc.email": "lhopman@21n39e.com",
+      "fund.email": "",
+      "fund.website": "",
+      "fund.country": "Bahrain",
+      "fund.city": "Manama",
+      "fund.sectors": "",
+      "fund.preferred_stage": "",
+      "poc.linkedin": "",
+      "fund.crunchbase": "",
+      "fund.linkedin": "",
+      "poc.phone": "",
+      "fund.phone": ""
+    },
+    "enriched": {
+      "fund.title": "21 North Advisors",
+      "fund.type": "Family Office",
+      "poc.first_name": "Laurent",
+      "poc.last_name": "Hopman",
+      "poc.role": "Founder",
+      "poc.email": "lhopman@21n39e.com",
+      "poc.description": "Founder of 21 North Advisors, a Bahrain-based multi-family office established in 2008. With over 27 years of experience, he previously held senior roles at Investcorp, Morgan Stanley, and UBS, specializing in hedge funds and tactical asset allocation. He holds an MBA from The Wharton School and an engineering degree from Ecole Centrale Paris.",
+      "fund.email": "info@21n39e.com",
+      "fund.website": "http://21northadvisors.com",
+      "fund.country": "Bahrain",
+      "fund.city": "Manama",
+      "fund.sectors": [
+        "private-equity",
+        "hedge-funds",
+        "real-estate",
+        "venture-capital",
+        "infrastructure"
+      ],
+      "fund.preferred_stage": null,
+      "poc.linkedin": null,
+      "fund.crunchbase": null,
+      "fund.linkedin": null,
+      "poc.phone": "+973 77 21 21 21",
+      "fund.phone": "+973 77 21 21 21",
+      "_enrichment_meta": {
+        "confidence": "high",
+        "fields_added": [
+          "poc.role",
+          "poc.description",
+          "fund.email",
+          "fund.website",
+          "fund.sectors",
+          "poc.phone",
+          "fund.phone"
+        ],
+        "fields_corrected": [],
+        "notes": "Identified Laurent Hopman as Founder with 27+ years experience (ex-Investcorp, Morgan Stanley). Confirmed website as 21northadvisors.com (21n39e.com is the email domain). Mapped sectors based on 'alternative investments' and specific mentions of hedge funds, private equity/buyouts, and real estate. LinkedIn profiles for the specific investor (vs the comic author of the same name) were not publicly indexed with high enough confidence to include."
+      }
+    },
+    "tokens": 9414
+  }
+]
