@@ -1,376 +1,159 @@
 # Silversky Capital - Investor CRM Data Enrichment
 
-**Status:** Multi-Stage Enrichment System Built ✅ | Ready for Phase 1 Execution
+**Status:** Phase 1 Complete ✅ | 539 Records Enriched
 
 ---
 
 ## Current State
 
-**Clean Dataset:** 544 perfectly validated records (from 6,528 total)
-- Exported to `data.csv` with semantic dot notation headers
-- 100% validation: no URL mismatches, no emails in wrong columns
-- Ready for enrichment
+**Enriched Dataset:** `data.csv` - 539 unique investor contacts
+- Enriched via Gemini 2.5 Pro with Google Search grounding
+- 87% clean records (no validation issues)
+- 99% role completion, 97% sectors, 88% descriptions
+- Deduplicated (removed 4 duplicate person+fund entries)
 
-**Enrichment System:** Multi-stage architecture built and tested
-- 23% more efficient than single-stage (6,675 vs 8,692 tokens/record)
-- Better quality: more comprehensive sectors, detailed descriptions
-- Production-ready: `scripts/multi_stage_enrichment.py`
+**Original Data:** `data_original.csv` - 544 raw records (backup)
 
 ---
 
 ## Project Structure
 
 ```
-/analysis
-├── CLAUDE.md                              # This file - savepoint doc
-├── TODO.md                                # Implementation requirements ⚠️
-├── data.csv                               # 544 clean records (154KB) ⭐
+├── CLAUDE.md                    # This file - project documentation
+├── data.csv                     # 539 enriched records (PRIMARY) ⭐
+├── data_original.csv            # 544 original records (backup)
+├── manual.md                    # Quick start guide
+├── .gitignore                   # Python/test artifacts
 │
-├── scripts/                               # Core scripts
-│   ├── export_clean_data.py              # Exports clean CSV from Excel
-│   ├── multi_stage_enrichment.py         # Production enrichment system ⭐
-│   ├── test_comprehensive_enrichment.py   # Single-stage reference
-│   └── test_gemini_enrichment.py          # Simple enrichment reference
+├── scripts/
+│   ├── run_enrichment.py        # Production runner ⭐
+│   ├── multi_stage_enrichment.py # Core enrichment engine
+│   └── export_clean_data.py     # Original data export script
 │
-├── docs/                                  # Enrichment documentation ⭐
-│   ├── multi-stage-enrichment-guide.md    # Complete usage guide
-│   ├── single-vs-multi-stage-comparison.md # Test results & recommendations
-│   └── gemini-grounding-learnings.md      # API discoveries & next steps
+├── docs/                        # Historical documentation
+│   ├── multi-stage-enrichment-guide.md
+│   ├── single-vs-multi-stage-comparison.md
+│   └── gemini-grounding-learnings.md
 │
-├── test_results/                          # Test outputs (for reference)
-│   ├── multi_stage_test_results.json      # Multi-stage test data
-│   └── test_enrichment_samples.json       # Single-stage test data
-│
-└── koder/                                 # Original materials (reference only)
-    ├── rough.md                           # Original requirements
-    └── docs/CRM.xlsx                      # Source Excel (6,528 records)
+└── koder/                       # Original source materials
+    ├── rough.md
+    └── docs/CRM.xlsx            # Source Excel (6,528 records)
 ```
 
 ---
 
-## Data Schema (Semantic Dot Notation)
+## Data Schema
 
 ```csv
 fund.title, fund.type, poc.first_name, poc.last_name, poc.role,
 poc.email, fund.email, fund.website, fund.country, fund.city,
 fund.sectors, fund.preferred_stage, poc.linkedin, fund.crunchbase,
-fund.linkedin, poc.phone, fund.phone
+fund.linkedin, poc.phone, fund.phone, poc.description,
+fund.description, fund.thesis, fund.portfolio_companies, fund.aum,
+fund.geographies, _validation_issues
 ```
 
 **Prefix Convention:**
 - `fund.*` = Company/organization fields
 - `poc.*` = Point of contact (person) fields
+- `_validation_issues` = Auto-detected quality flags
 
 ---
 
-## Critical Discovery: Gemini API Limitations
+## Quality Metrics (Phase 1 Results)
 
-### What Doesn't Work ❌
-```python
-# API returns 400 error - field not recognized
-"tools": [{
-    "googleSearch": {
-        "dynamicRetrievalConfig": {
-            "mode": "MODE_DYNAMIC",
-            "dynamicThreshold": 0.7
-        }
-    }
-}]
-```
+| Metric | Value |
+|--------|-------|
+| Total records | 539 |
+| Clean records | 87% |
+| POC LinkedIn mismatches | 1.3% (auto-cleared) |
+| Fund LinkedIn issues | 0% |
+| Missing descriptions | 12% |
 
-### What Works ✅
-```python
-"tools": [{
-    "googleSearch": {}  # Simple on/off only
-}]
-```
+### Field Completion
 
-**Implication:** Cannot control grounding via API config. Must use:
-1. Prompt design (clear, focused queries)
-2. Multi-stage architecture (separate POC vs Fund queries)
-3. Query structure (explicit field definitions)
+| Field | Rate |
+|-------|------|
+| poc.role | 99% |
+| fund.sectors | 97% |
+| fund.website | 95% |
+| poc.description | 88% |
+| poc.linkedin | 75% |
+| fund.linkedin | 62% |
+| fund.crunchbase | 62% |
+| poc.phone | 22% |
 
 ---
 
-## Multi-Stage Enrichment System
+## Enrichment System
 
-### Architecture
+### Model: `gemini-2.5-pro`
+- Best balance of speed (~40s/record) and quality
+- With Google Search grounding for real-time data
 
-**Stage 1: POC (Person) Enrichment**
-- Focus: `poc.linkedin`, `poc.role`, `poc.description`, `poc.phone`
-- Search strategy: "[Name] [Company]" - personal profiles
-- Tokens: ~3,000-5,000
+### Architecture (2-Stage)
 
-**Stage 2: Fund (Company) Enrichment**
-- Focus: `fund.linkedin`, `fund.crunchbase`, `fund.website`, `fund.sectors`, `fund.preferred_stage`
-- Search strategy: "[Company] [Type]" - organization info
-- Tokens: ~3,000-5,000
+**Stage 1: POC (Person)**
+- Fields: poc.linkedin, poc.role, poc.description, poc.phone
+- Validation: LinkedIn URL must contain person's name
 
-**Stage 3: Deep Research (Optional)**
-- Focus: `fund.description`, `fund.thesis`, `fund.portfolio_companies`, `fund.aum`
-- Use for: High-value prospects, detailed analysis
-- Tokens: ~4,000-8,000
+**Stage 2: Fund (Company)**
+- Fields: fund.linkedin, fund.crunchbase, fund.website, fund.sectors
+- Validation: LinkedIn must be /company/ URL (not personal)
 
-### Test Results
+### Running Enrichment
 
-**Single-Stage Comprehensive (5 samples):**
-- Success: 5/5, all high confidence
-- Tokens: 8,692 avg/record
-- Total: 43,460 tokens
-
-**Multi-Stage POC+Fund (2 samples):**
-- Success: 2/2, 4/4 stages high confidence
-- Tokens: 6,675 avg/record (23% fewer)
-- Total: 13,350 tokens
-- Quality: Better descriptions, more comprehensive sectors (6-8 vs 3-5)
-
-### Why Multi-Stage Wins
-
-1. **23% more efficient** - Fewer tokens, lower cost
-2. **Better quality** - More detailed, comprehensive
-3. **Observable** - Per-stage `search_quality` metadata
-4. **Flexible** - Can skip stages, tune individually
-5. **Robust** - Graceful degradation if stage fails
-
----
-
-## Cost Estimates
-
-### Phase 1: 544 Clean Records
-
-| Approach | Tokens | Cost @ $0.15/1M |
-|----------|--------|-----------------|
-| Single-Stage | ~4.7M | $0.71 |
-| Multi-Stage | ~3.6M | $0.54 |
-| **Savings** | **1.1M** | **$0.17** |
-
-### Phase 2: Aggressive (6,528 → ~2,000 enriched)
-
-| Approach | Tokens | Cost |
-|----------|--------|------|
-| Single-Stage | ~14M | $2.10 |
-| Multi-Stage | ~10.8M | $1.62 |
-| **Savings** | **3.2M** | **$0.48** |
-
----
-
-## Key Files
-
-### `scripts/multi_stage_enrichment.py` ⭐
-**Production multi-stage enrichment system**
-
-**Usage:**
-```python
-from scripts.multi_stage_enrichment import MultiStageEnricher
-
-enricher = MultiStageEnricher()
-
-result = enricher.enrich_record_multistage(
-    record=my_record,
-    stages=["poc", "fund"],  # or ["poc", "fund", "deep"]
-    delay_between_stages=2
-)
-```
-
-**Features:**
-- Configurable stage selection
-- Per-stage search quality metrics
-- Graceful error handling
-- JSON output with metadata
-
-### `scripts/export_clean_data.py`
-**Exports perfectly validated CSV from Excel**
-
-**Validation:**
-- URLs must match field type (LinkedIn only in LinkedIn fields)
-- No emails in wrong columns
-- No URLs in name/role fields
-- Strict field type checking
-
-**Output:** `data.csv` - 544 records, 17 fields, 154KB
-
-### `docs/multi-stage-enrichment-guide.md`
-**Complete usage guide and testing protocols**
-- Stage architecture explanation
-- Configuration options
-- Experimentation guide
-- Token economics
-
-### `docs/single-vs-multi-stage-comparison.md`
-**Detailed test comparison and recommendations**
-- Test results analysis
-- Quality comparison
-- Cost estimates
-- Implementation strategy
-
-### `docs/gemini-grounding-learnings.md`
-**API discoveries and insights**
-- What works/doesn't work
-- Prompt design best practices
-- Limitations discovered
-- Next steps for Phase 1
-
----
-
-## Next Steps: Phase 1 Execution
-
-### 1. Run Full Enrichment (544 Records)
-
-**Configuration:**
-- Stages: `["poc", "fund"]` (2-stage)
-- Delay: 2s between stages, 3s between records
-- Batch size: 10 records
-
-**Expected:**
-- Time: 2-3 hours
-- Tokens: ~3.6M ($0.54)
-- Success rate: ~95%+ (based on tests)
-
-**Script to create:**
 ```bash
-python3 scripts/run_production_enrichment.py \
+# Full run (539 records, ~3-5 min with 40 workers)
+python3 scripts/run_enrichment.py \
   --input data.csv \
   --output data_enriched.csv \
-  --stages poc,fund \
-  --batch-size 10
+  --workers 40
+
+# Test with subset
+python3 scripts/run_enrichment.py \
+  --limit 10 \
+  --workers 10 \
+  --verbose
 ```
 
-### 2. Monitor & Analyze
+### Cost
 
-**Track:**
-- Success rate per stage
-- Search quality distribution
-- Actual vs predicted tokens
-- Fields found per stage
-- Error patterns
-
-**Output:**
-- `data_enriched.csv` - Enriched records
-- `enrichment_report.json` - Stats and quality metrics
-- `enrichment_errors.log` - Failed records for review
-
-### 3. Quality Check
-
-**Validate:**
-- URL formats and types
-- Sector standardization
-- Description quality (professional, specific)
-- Confidence scores (prioritize high confidence)
-
-### 4. Decide on Phase 2
-
-**After reviewing Phase 1:**
-- Quality good enough? Proceed to aggressive enrichment
-- Need prompt refinement? Iterate and retest
-- Want Stage 3 (deep)? Test on subset first
+- ~7,600 tokens per record
+- Input: $1.25/1M tokens, Output: $10.00/1M tokens
+- **Full 539 records: ~$34**
 
 ---
 
-## Environment Setup
-
-**Required:**
-```bash
-export GEMINI_API_KEY='your-key-here'
-```
-
-**Check:**
-```bash
-if [ -z "$GEMINI_API_KEY" ]; then
-  echo "❌ Not set"
-else
-  echo "✅ Set (${#GEMINI_API_KEY} chars)"
-fi
-```
-
-**Model:** `gemini-3-pro-preview` (tons of credits available)
-
----
-
-## Technical Notes
-
-### Standard Sectors List
+## Standard Sectors
 
 ```python
-["venture-capital", "private-equity", "hedge-funds", "real-estate",
- "technology", "healthcare", "fintech", "cleantech", "biotech",
- "consumer", "enterprise-software", "ai-ml", "crypto-blockchain",
- "infrastructure", "energy", "manufacturing", "retail", "hospitality",
- "education", "media", "telecommunications", "agriculture", "transportation",
- "aerospace", "defense", "public-markets", "fixed-income", "commodities",
- "impact-investing", "esg", "sustainable-finance"]
+[
+    # Investment types
+    "venture-capital", "private-equity", "hedge-funds", "growth-capital",
+    "private-debt", "public-markets", "fixed-income", "commodities",
+    # Industries
+    "technology", "software", "saas", "enterprise-software", "ai-ml",
+    "healthcare", "healthtech", "biotech", "fintech", "cleantech",
+    "real-estate", "infrastructure", "energy", "manufacturing",
+    "consumer", "retail", "ecommerce", "hospitality",
+    "media", "entertainment", "telecommunications",
+    "aerospace", "defense", "transportation", "agriculture",
+    "education", "financial-services", "insurance",
+    # Themes
+    "crypto-blockchain", "impact-investing", "esg", "sustainable-finance"
+]
 ```
 
-### Enrichment Metadata
+---
 
-Each stage returns:
-```json
-{
-  "_stage_meta": {
-    "confidence": "high|medium|low",
-    "fields_found": ["list of enriched fields"],
-    "fields_corrected": ["list of corrections"],
-    "search_quality": "excellent|good|limited|poor",
-    "notes": "explanation and caveats"
-  }
-}
+## Environment
+
+```bash
+export GEMINI_API_KEY='your-key'
 ```
 
-### Rate Limiting
-
-**Conservative (recommended):**
-- 2s between stages
-- 3s between records
-- Batch size: 10
-
-**Aggressive (may hit limits):**
-- 1s between stages
-- 1s between records
-- Batch size: 20
-
 ---
 
-## Next Steps & TODO
-
-⚠️ **See `TODO.md` for detailed implementation requirements** ⚠️
-
-### Critical Missing Features:
-
-1. **Parallel Processing** ❌
-   - Current: Sequential (1 record at a time)
-   - Needed: ThreadPoolExecutor with max_workers=20
-   - Impact: 20x faster processing (10-15 min vs 2-3 hours)
-
-2. **Graceful Resumability** ❌
-   - Current: No checkpoint system
-   - Needed: Save progress, resume from interruption
-   - Impact: Can stop/restart without losing progress
-
-**Action Required:** Build `run_production_enrichment.py` with these features
-**Estimated Time:** 1-2 hours implementation + 30 min testing
-**Details:** See `TODO.md` for complete specifications
-
----
-
-## Resume Points
-
-**If continuing later:**
-
-1. **Where we left off:** Multi-stage system built and tested, ready for Phase 1
-2. **What to do next:** Build production runner (see `TODO.md`)
-3. **Key files to review:**
-   - `scripts/multi_stage_enrichment.py` (core enrichment system)
-   - `docs/gemini-grounding-learnings.md` (API discoveries)
-   - `TODO.md` (implementation requirements) ⭐
-4. **Data ready:** `data.csv` (544 clean records)
-5. **API key:** Already set in environment
-
-**Before running Phase 1:**
-- ✅ Multi-stage system tested and working
-- ❌ Production runner with parallel + resumability (see TODO.md)
-- ❌ Test run with 10 records first
-
----
-
-**Last Updated:** 2025-11-19
-**Current Task:** Ready to build production enrichment runner for Phase 1 (544 records)
-**Estimated Phase 1 Cost:** $0.54 (3.6M tokens)
+**Last Updated:** 2025-11-25
+**Phase 1 Completed:** 539 records enriched, deduplicated, validated
