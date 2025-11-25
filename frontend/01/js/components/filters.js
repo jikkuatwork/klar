@@ -50,7 +50,7 @@ const Filters = (function() {
             <!-- Fund Type -->
             <div class="w-full sm:w-auto">
               <label class="block text-xs font-medium text-secondary/60 dark:text-white/60 mb-1">Fund Type</label>
-              <select id="filter-fund-type" class="input text-sm py-1.5" multiple size="1">
+              <select id="filter-fund-type" class="input text-sm py-1.5">
                 <option value="">All Types</option>
                 ${fundTypes.map(t => `
                   <option value="${escapeHtml(t)}" ${filters.fundType?.includes(t) ? 'selected' : ''}>
