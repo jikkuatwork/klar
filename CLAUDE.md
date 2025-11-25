@@ -4,6 +4,20 @@
 
 ---
 
+## Project Structure
+
+```
+├── CLAUDE.md        # This file
+├── data.csv         # 527 investor contacts (PRIMARY)
+├── .gitignore
+└── koder/           # Meta folder (original source materials)
+    ├── rough.md
+    └── docs/
+        └── CRM.xlsx # Source Excel (6,528 records)
+```
+
+---
+
 ## Dataset: `data.csv`
 
 527 unique investor contacts with:
