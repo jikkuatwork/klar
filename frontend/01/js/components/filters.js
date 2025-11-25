@@ -170,20 +170,15 @@ const Filters = (function() {
       }
     });
 
-    // Search
+    // Search (only on Enter key)
     const searchInput = $('#filter-search', container);
     if (searchInput) {
-      const debouncedSearch = debounce((value) => {
-        State.set('searchQuery', value);
-        notifyFilterChange();
-      }, 300);
-
-      searchInput.addEventListener('input', (e) => {
-        debouncedSearch(e.target.value);
-      });
-
       searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          State.set('searchQuery', searchInput.value);
+          notifyFilterChange();
+        } else if (e.key === 'Escape') {
           searchInput.value = '';
           State.set('searchQuery', '');
           searchInput.blur();
