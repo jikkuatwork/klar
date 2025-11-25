@@ -78,12 +78,17 @@
     container.innerHTML = `
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         ${savedLists.map(list => `
-          <div class="card">
+          <div class="card cursor-pointer hover:shadow-lg transition-shadow" data-list-id="${list.id}">
             <div class="flex items-start justify-between mb-2">
               <h3 class="font-medium">${escapeHtml(list.label)}</h3>
-              <button class="btn btn-icon btn-ghost btn-sm" data-delete="${list.id}" title="Delete">
-                <i data-feather="trash-2" class="w-4 h-4"></i>
-              </button>
+              <div class="flex items-center gap-1">
+                <button class="btn btn-icon btn-ghost btn-sm" data-export="${list.id}" title="Export">
+                  <i data-feather="download" class="w-4 h-4"></i>
+                </button>
+                <button class="btn btn-icon btn-ghost btn-sm text-red-500" data-delete="${list.id}" title="Delete">
+                  <i data-feather="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
             </div>
             <p class="text-sm text-secondary/60 dark:text-white/60 mb-2">
               ${list.recordIds.length} investor${list.recordIds.length !== 1 ? 's' : ''}
@@ -96,7 +101,36 @@
       </div>
     `;
 
-    // Setup delete handlers
+    // Click on card to view list
+    $$('[data-list-id]', container).forEach(card => {
+      card.addEventListener('click', (e) => {
+        // Don't trigger if clicking buttons
+        if (e.target.closest('button')) return;
+        const listId = card.dataset.listId;
+        const list = savedLists.find(l => l.id === listId);
+        if (list) {
+          openSavedListView(list);
+        }
+      });
+    });
+
+    // Export list
+    $$('[data-export]', container).forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const listId = btn.dataset.export;
+        const list = savedLists.find(l => l.id === listId);
+        if (list) {
+          const records = list.recordIds
+            .map(id => State.getRecord(id))
+            .filter(Boolean);
+          CSV.download(records, `klar-${list.label.toLowerCase().replace(/\s+/g, '-')}`);
+          Toast.success(`Exported ${records.length} records`);
+        }
+      });
+    });
+
+    // Delete list
     $$('[data-delete]', container).forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -110,6 +144,65 @@
         }
       });
     });
+  }
+
+  function openSavedListView(list) {
+    const records = list.recordIds
+      .map(id => State.getRecord(id))
+      .filter(Boolean);
+
+    const content = `
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-secondary/60 dark:text-white/60">
+            ${records.length} investor${records.length !== 1 ? 's' : ''} • Created ${timeAgo(list.created)}
+          </p>
+          <button class="btn btn-sm btn-primary" id="export-list">
+            <i data-feather="download" class="w-4 h-4"></i>
+            Export
+          </button>
+        </div>
+        <div class="space-y-2 max-h-[60vh] overflow-y-auto">
+          ${records.map(r => `
+            <div class="flex items-center gap-3 p-3 bg-secondary/5 dark:bg-white/5 rounded-lg cursor-pointer hover:bg-secondary/10 dark:hover:bg-white/10" data-poc-id="${r['poc.id']}">
+              <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary-700 flex-shrink-0">
+                ${Format.initials(r['poc.first_name'], r['poc.last_name'])}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-sm truncate">${escapeHtml(Format.name(r['poc.first_name'], r['poc.last_name']))}</p>
+                <p class="text-xs text-secondary/60 dark:text-white/60 truncate">${escapeHtml(r['fund.title'] || '-')}</p>
+              </div>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                ${Format.flag(r['fund.country'])}
+                ${State.isStarred(r['poc.id']) ? '<i data-feather="star" class="w-3 h-3 text-primary fill-current"></i>' : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    Modal.open({ title: list.label, content, size: 'lg' });
+
+    // Export button
+    $('#export-list')?.addEventListener('click', () => {
+      CSV.download(records, `klar-${list.label.toLowerCase().replace(/\s+/g, '-')}`);
+      Toast.success(`Exported ${records.length} records`);
+    });
+
+    // Click to open detail
+    $$('[data-poc-id]').forEach(el => {
+      el.addEventListener('click', () => {
+        Modal.close();
+        setTimeout(() => {
+          Modal.openDetail(el.dataset.pocId);
+        }, 300);
+      });
+    });
+
+    if (window.feather) {
+      feather.replace();
+    }
   }
 
   function renderWithNotes(container) {
@@ -234,10 +327,10 @@
       </div>
     `;
 
-    // Click handlers
+    // Click handlers to open detail modal
     $$('[data-poc-id]', container).forEach(el => {
       el.addEventListener('click', () => {
-        Toast.info('Detail view coming soon');
+        Modal.openDetail(el.dataset.pocId);
       });
     });
   }

@@ -97,17 +97,35 @@
         .filter(Boolean);
 
       const popupContent = `
-        <div style="min-width: 150px;">
+        <div style="min-width: 180px;">
           <strong>${cityData.name}</strong>
-          <p style="color: #666; font-size: 12px; margin: 4px 0;">${cityRecords.length} fund${cityRecords.length > 1 ? 's' : ''}</p>
+          <p style="color: #666; font-size: 12px; margin: 4px 0;">${cityRecords.length} investor${cityRecords.length > 1 ? 's' : ''}</p>
           <ul style="margin: 0; padding-left: 16px; font-size: 12px;">
             ${fundNames.map(name => `<li>${escapeHtml(name)}</li>`).join('')}
             ${cityRecords.length > 3 ? `<li style="color: #666;">+${cityRecords.length - 3} more</li>` : ''}
           </ul>
+          <button
+            class="map-view-btn"
+            data-city="${cityCode}"
+            style="margin-top: 8px; padding: 4px 8px; background: #DEC26F; color: #15213B; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; width: 100%;"
+          >
+            View All
+          </button>
         </div>
       `;
 
       marker.bindPopup(popupContent);
+
+      // Handle popup open to attach click handler
+      marker.on('popupopen', () => {
+        const btn = document.querySelector(`.map-view-btn[data-city="${cityCode}"]`);
+        if (btn) {
+          btn.addEventListener('click', () => {
+            openCityInvestors(cityData.name, cityRecords);
+          });
+        }
+      });
+
       markers.push(marker);
     });
 
@@ -115,6 +133,49 @@
     if (markers.length > 0) {
       const group = L.featureGroup(markers);
       map.fitBounds(group.getBounds().pad(0.1));
+    }
+  }
+
+  function openCityInvestors(cityName, records) {
+    const content = `
+      <div class="space-y-4">
+        <p class="text-sm text-secondary/60 dark:text-white/60">
+          ${records.length} investor${records.length !== 1 ? 's' : ''} in ${cityName}
+        </p>
+        <div class="space-y-2 max-h-[60vh] overflow-y-auto">
+          ${records.map(r => `
+            <div class="flex items-center gap-3 p-3 bg-secondary/5 dark:bg-white/5 rounded-lg cursor-pointer hover:bg-secondary/10 dark:hover:bg-white/10" data-poc-id="${r['poc.id']}">
+              <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary-700 flex-shrink-0">
+                ${Format.initials(r['poc.first_name'], r['poc.last_name'])}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-sm truncate">${escapeHtml(Format.name(r['poc.first_name'], r['poc.last_name']))}</p>
+                <p class="text-xs text-secondary/60 dark:text-white/60 truncate">${escapeHtml(r['fund.title'] || '-')}</p>
+              </div>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <span class="badge text-xs">${escapeHtml(r['fund.type'] || '-')}</span>
+                ${State.isStarred(r['poc.id']) ? '<i data-feather="star" class="w-3 h-3 text-primary fill-current"></i>' : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    Modal.open({ title: cityName, content, size: 'lg' });
+
+    // Click to open detail
+    $$('[data-poc-id]').forEach(el => {
+      el.addEventListener('click', () => {
+        Modal.close();
+        setTimeout(() => {
+          Modal.openDetail(el.dataset.pocId);
+        }, 300);
+      });
+    });
+
+    if (window.feather) {
+      feather.replace();
     }
   }
 
