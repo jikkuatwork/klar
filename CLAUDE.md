@@ -1,18 +1,89 @@
 # Silversky Capital - Investor CRM Data Enrichment
 
-**Status:** Phase 1 Complete ✅ | 539 Records Enriched
+**Status:** Phase 2 Complete ✅ | 527 Records
 
 ---
 
 ## Current State
 
-**Enriched Dataset:** `data.csv` - 539 unique investor contacts
+**Enriched Dataset:** `data.csv` - 527 unique investor contacts
 - Enriched via Gemini 2.5 Pro with Google Search grounding
-- 87% clean records (no validation issues)
-- 99% role completion, 97% sectors, 88% descriptions
-- Deduplicated (removed 4 duplicate person+fund entries)
+- Cleaned, standardized, and deduplicated
+- Location codes: ISO 3166-1 (countries) + UN/LOCODE (cities)
+- Unique IDs: 8-char alphanumeric (poc.id, fund.id)
 
 **Original Data:** `data_original.csv` - 544 raw records (backup)
+
+---
+
+## Data Schema (29 fields)
+
+```csv
+# Identifiers
+poc.id, fund.id
+
+# POC (Point of Contact) fields
+poc.first_name, poc.last_name, poc.role, poc.email, poc.linkedin,
+poc.phone, poc.description
+
+# Fund fields
+fund.title, fund.type, fund.email, fund.website, fund.country,
+fund.city, fund.sectors, fund.preferred_stage, fund.crunchbase,
+fund.linkedin, fund.phone, fund.description, fund.thesis,
+fund.portfolio_companies, fund.geographies
+
+# Financial fields (raw USD integers)
+fund.aum.value, fund.aum.year, fund.ticket.min, fund.ticket.max
+
+# Metadata
+_validation_issues
+```
+
+**Naming Convention:**
+- `poc.*` = Point of contact (person) fields
+- `fund.*` = Company/organization fields
+- Nested fields use dots: `fund.aum.value`, `fund.ticket.min`
+- `_validation_issues` = Auto-detected quality flags
+
+---
+
+## Location Standards
+
+### Countries: ISO 3166-1 alpha-2
+- **Standard:** [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+- **Format:** 2-letter uppercase codes (e.g., `US`, `GB`, `CH`, `DE`)
+- **Field:** `fund.country`
+
+### Cities: UN/LOCODE
+- **Standard:** [UN/LOCODE](https://unece.org/trade/uncefact/unlocode)
+- **Format:** 3-letter uppercase codes (e.g., `NYC`, `LON`, `ZRH`, `SFO`)
+- **Field:** `fund.city`
+- **Note:** We store only the 3-letter city portion (country is separate)
+
+### JS Libraries for Web App
+
+```javascript
+// Country flags (SVG)
+// https://www.npmjs.com/package/country-flag-icons
+import { US, GB, CH } from 'country-flag-icons/react/3x2'
+
+// Country names from ISO codes
+// https://www.npmjs.com/package/i18n-iso-countries
+import countries from 'i18n-iso-countries'
+countries.getName('US', 'en') // → "United States"
+
+// City coordinates from UN/LOCODE
+// https://www.npmjs.com/package/@geoapify/un-locode
+// Provides lat/lng for map placement
+
+// Alternative: Simple lookup tables
+const CITY_NAMES = {
+  'NYC': 'New York',
+  'LON': 'London',
+  'ZRH': 'Zurich',
+  // ...
+}
+```
 
 ---
 
@@ -20,15 +91,17 @@
 
 ```
 ├── CLAUDE.md                    # This file - project documentation
-├── data.csv                     # 539 enriched records (PRIMARY) ⭐
+├── data.csv                     # 527 enriched records (PRIMARY) ⭐
 ├── data_original.csv            # 544 original records (backup)
 ├── manual.md                    # Quick start guide
 ├── .gitignore                   # Python/test artifacts
 │
 ├── scripts/
-│   ├── run_enrichment.py        # Production runner ⭐
+│   ├── run_enrichment.py        # Production enrichment runner
 │   ├── multi_stage_enrichment.py # Core enrichment engine
-│   └── export_clean_data.py     # Original data export script
+│   ├── consistency_check.py     # Data quality validation
+│   ├── standardize_locations.py # ISO/LOCODE transformation
+│   └── export_clean_data.py     # Original data export
 │
 ├── docs/                        # Historical documentation
 │   ├── multi-stage-enrichment-guide.md
@@ -39,49 +112,6 @@
     ├── rough.md
     └── docs/CRM.xlsx            # Source Excel (6,528 records)
 ```
-
----
-
-## Data Schema
-
-```csv
-fund.title, fund.type, poc.first_name, poc.last_name, poc.role,
-poc.email, fund.email, fund.website, fund.country, fund.city,
-fund.sectors, fund.preferred_stage, poc.linkedin, fund.crunchbase,
-fund.linkedin, poc.phone, fund.phone, poc.description,
-fund.description, fund.thesis, fund.portfolio_companies, fund.aum,
-fund.geographies, _validation_issues
-```
-
-**Prefix Convention:**
-- `fund.*` = Company/organization fields
-- `poc.*` = Point of contact (person) fields
-- `_validation_issues` = Auto-detected quality flags
-
----
-
-## Quality Metrics (Phase 1 Results)
-
-| Metric | Value |
-|--------|-------|
-| Total records | 539 |
-| Clean records | 87% |
-| POC LinkedIn mismatches | 1.3% (auto-cleared) |
-| Fund LinkedIn issues | 0% |
-| Missing descriptions | 12% |
-
-### Field Completion
-
-| Field | Rate |
-|-------|------|
-| poc.role | 99% |
-| fund.sectors | 97% |
-| fund.website | 95% |
-| poc.description | 88% |
-| poc.linkedin | 75% |
-| fund.linkedin | 62% |
-| fund.crunchbase | 62% |
-| poc.phone | 22% |
 
 ---
 
@@ -99,12 +129,13 @@ fund.geographies, _validation_issues
 
 **Stage 2: Fund (Company)**
 - Fields: fund.linkedin, fund.crunchbase, fund.website, fund.sectors
+- Financial: fund.aum.value, fund.aum.year, fund.ticket.min, fund.ticket.max
 - Validation: LinkedIn must be /company/ URL (not personal)
 
 ### Running Enrichment
 
 ```bash
-# Full run (539 records, ~3-5 min with 40 workers)
+# Full run (~3-5 min with 40 workers)
 python3 scripts/run_enrichment.py \
   --input data.csv \
   --output data_enriched.csv \
@@ -117,11 +148,11 @@ python3 scripts/run_enrichment.py \
   --verbose
 ```
 
-### Cost
+### Cost (gemini-2.5-pro)
 
 - ~7,600 tokens per record
 - Input: $1.25/1M tokens, Output: $10.00/1M tokens
-- **Full 539 records: ~$34**
+- **Full dataset: ~$34**
 
 ---
 
@@ -156,4 +187,4 @@ export GEMINI_API_KEY='your-key'
 ---
 
 **Last Updated:** 2025-11-25
-**Phase 1 Completed:** 539 records enriched, deduplicated, validated
+**Records:** 527 (cleaned, standardized, with unique IDs)
