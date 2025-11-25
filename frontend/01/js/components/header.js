@@ -37,6 +37,21 @@ const Header = (function() {
         <!-- Actions -->
         <div class="flex items-center gap-2">
           <button
+            id="add-investor-btn"
+            class="btn btn-sm btn-primary hidden sm:flex"
+            title="Add new investor"
+          >
+            <i data-feather="plus" class="w-4 h-4"></i>
+            <span class="hidden md:inline">Add</span>
+          </button>
+          <button
+            id="add-investor-btn-mobile"
+            class="btn btn-icon btn-primary sm:hidden"
+            title="Add new investor"
+          >
+            <i data-feather="plus" class="w-5 h-5"></i>
+          </button>
+          <button
             id="theme-toggle"
             class="btn btn-icon btn-ghost"
             title="Toggle theme"
@@ -59,6 +74,9 @@ const Header = (function() {
 
     // Setup theme toggle
     setupThemeToggle();
+
+    // Setup add investor button
+    setupAddButton();
   }
 
   /**
@@ -123,6 +141,21 @@ const Header = (function() {
         feather.replace();
       }
     });
+  }
+
+  /**
+   * Setup add investor button
+   */
+  function setupAddButton() {
+    const addBtn = $('#add-investor-btn');
+    const addBtnMobile = $('#add-investor-btn-mobile');
+
+    const handleAdd = () => {
+      AddRecord.open();
+    };
+
+    addBtn?.addEventListener('click', handleAdd);
+    addBtnMobile?.addEventListener('click', handleAdd);
   }
 
   /**
