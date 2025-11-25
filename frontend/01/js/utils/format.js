@@ -234,8 +234,37 @@ const Format = (function() {
   /**
    * Sector name formatting (kebab-case to Title Case)
    */
+  const SECTOR_SPECIAL_CASES = {
+    'ai-ml': 'AI/ML',
+    'saas': 'SaaS',
+    'esg': 'ESG',
+    'ecommerce': 'eCommerce',
+    'fintech': 'FinTech',
+    'healthtech': 'HealthTech',
+    'cleantech': 'CleanTech',
+    'biotech': 'BioTech',
+    'edtech': 'EdTech',
+    'proptech': 'PropTech',
+    'regtech': 'RegTech',
+    'insurtech': 'InsurTech',
+    'agtech': 'AgTech',
+    'iot': 'IoT',
+    'ar-vr': 'AR/VR',
+    'b2b': 'B2B',
+    'b2c': 'B2C',
+    'd2c': 'D2C'
+  };
+
   function sectorName(sector) {
     if (!sector) return '';
+
+    // Check for special cases first
+    const lower = sector.toLowerCase();
+    if (SECTOR_SPECIAL_CASES[lower]) {
+      return SECTOR_SPECIAL_CASES[lower];
+    }
+
+    // Default: convert kebab-case to Title Case
     return sector
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
