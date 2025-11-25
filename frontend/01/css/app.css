@@ -480,6 +480,12 @@ textarea:focus-visible {
   border-collapse: collapse;
 }
 
+.table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
 .table th {
   padding: 0.75rem 1rem;
   font-size: 0.75rem;
@@ -490,11 +496,13 @@ textarea:focus-visible {
   color: rgba(21, 33, 59, 0.6);
   border-bottom: 1px solid rgba(21, 33, 59, 0.1);
   white-space: nowrap;
+  background-color: white;
 }
 
 .dark .table th {
   color: rgba(255, 255, 255, 0.6);
   border-bottom-color: rgba(255, 255, 255, 0.1);
+  background-color: #15213B;
 }
 
 .table th.sortable {
