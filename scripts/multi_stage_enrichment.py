@@ -18,23 +18,32 @@ import time
 from typing import Dict, List, Optional, Any
 
 class MultiStageEnricher:
-    def __init__(self, api_key=None):
+    def __init__(self, api_key=None, model=None):
         self.api_key = api_key or os.environ.get('GEMINI_API_KEY')
         if not self.api_key:
             raise Exception("GEMINI_API_KEY environment variable required")
 
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
-        self.model = "gemini-3-pro-preview"
+        # gemini-2.5-pro = best balance of speed (~40s) and quality
+        # gemini-2.0-flash = fast (~10s) but lower quality
+        # gemini-3-pro-preview = slow thinking model (~5min+), avoid
+        self.model = model or "gemini-2.5-pro"
 
-        # Standardized sector list
+        # Standardized sector list (expanded based on common findings)
         self.standard_sectors = [
-            "venture-capital", "private-equity", "hedge-funds", "real-estate",
-            "technology", "healthcare", "fintech", "cleantech", "biotech",
-            "consumer", "enterprise-software", "ai-ml", "crypto-blockchain",
-            "infrastructure", "energy", "manufacturing", "retail", "hospitality",
-            "education", "media", "telecommunications", "agriculture", "transportation",
-            "aerospace", "defense", "public-markets", "fixed-income", "commodities",
-            "impact-investing", "esg", "sustainable-finance"
+            # Investment types
+            "venture-capital", "private-equity", "hedge-funds", "growth-capital",
+            "private-debt", "public-markets", "fixed-income", "commodities",
+            # Industries
+            "technology", "software", "saas", "enterprise-software", "ai-ml",
+            "healthcare", "healthtech", "biotech", "fintech", "cleantech",
+            "real-estate", "infrastructure", "energy", "manufacturing",
+            "consumer", "retail", "ecommerce", "hospitality",
+            "media", "entertainment", "telecommunications",
+            "aerospace", "defense", "transportation", "agriculture",
+            "education", "financial-services", "insurance",
+            # Themes
+            "crypto-blockchain", "impact-investing", "esg", "sustainable-finance"
         ]
 
     def build_poc_enrichment_prompt(self, record: Dict) -> str:
@@ -50,7 +59,8 @@ class MultiStageEnricher:
         prompt = f"""You are a professional contact research specialist. Focus ONLY on the PERSON, not the company.
 
 PERSON TO RESEARCH:
-- Name: {first_name} {last_name}
+- First Name: {first_name}
+- Last Name: {last_name}
 - Current role: {existing_role or 'Unknown'}
 - Company: {company_name} ({company_type})
 - Current LinkedIn: {existing_linkedin or 'MISSING'}
@@ -59,26 +69,30 @@ YOUR TASK: Research this PERSON using Google Search and provide:
 
 1. **poc.linkedin** - Personal LinkedIn profile URL (linkedin.com/in/...)
    - Must be the person's profile, NOT the company page
-   - Only if you find it with high confidence
+   - CRITICAL VALIDATION: The LinkedIn username MUST contain "{first_name.lower()}" or "{last_name.lower()}" (or close variant)
+   - Example: For "John Smith", valid URLs include: john-smith, johnsmith, john-smith-123, jsmith
+   - If the URL doesn't match the person's name, return null
+   - Only return if HIGH confidence this is the correct person
 
 2. **poc.role** - Their exact role/title at {company_name}
    - Current position only
    - Verify accuracy
 
-3. **poc.description** - Professional bio (2-3 sentences)
-   - Their role and key responsibilities
-   - Years of experience (if findable)
-   - Previous companies/roles (if notable)
-   - Education or specializations (if relevant)
+3. **poc.description** - Professional bio (3-4 sentences)
+   - Their current role and key responsibilities
+   - Career history: previous companies/roles (REQUIRED if findable)
+   - Years of experience or career start date
+   - Education, certifications, or specializations
    - Write in third person, professional tone
+   - If insufficient information found, still write what you can verify
 
 4. **poc.phone** - Direct phone number (if publicly available)
 
 RULES:
-- Focus search on the PERSON, not the company
-- Only add data with HIGH confidence
-- Use null for fields you cannot verify
-- For description: Be specific, factual, professional
+- Focus search on the PERSON "{first_name} {last_name}", not the company
+- IMPORTANT: Verify the LinkedIn profile belongs to someone named {first_name} {last_name}
+- Use null for fields you cannot verify with confidence
+- For description: Be specific, factual, professional - always attempt to write something
 - Verify the person works at {company_name}
 
 RETURN FORMAT (JSON only):
@@ -111,6 +125,9 @@ Return ONLY valid JSON, no additional text."""
         existing_website = record.get('fund.website', '')
         existing_sectors = record.get('fund.sectors', '')
 
+        # Create searchable company name variants for validation
+        company_words = [w.lower() for w in company_name.split() if len(w) > 2 and w.lower() not in ('the', 'and', 'llc', 'inc', 'ltd', 'corp', 'llp', 'sa', 'ag', 'gmbh')]
+
         prompt = f"""You are a professional company research specialist. Focus ONLY on the COMPANY, not individuals.
 
 COMPANY TO RESEARCH:
@@ -125,11 +142,16 @@ COMPANY TO RESEARCH:
 YOUR TASK: Research this COMPANY using Google Search and provide:
 
 1. **fund.linkedin** - Company LinkedIn page (linkedin.com/company/...)
-   - Must be company page, NOT personal profiles
-   - Official page only
+   - MUST be a COMPANY page: linkedin.com/company/...
+   - NEVER return personal profiles (linkedin.com/in/...) - these are INVALID
+   - CRITICAL: The URL slug should relate to "{company_name}"
+   - Example valid: linkedin.com/company/altman-advisors for "Altman Advisors"
+   - Example INVALID: linkedin.com/in/john-smith (this is a person, not a company!)
+   - If you cannot find the official company page, return null
 
 2. **fund.crunchbase** - Crunchbase organization page (crunchbase.com/organization/...)
    - Official profile only
+   - URL should contain company name or recognizable variant
 
 3. **fund.website** - Official company website
    - Primary domain only
@@ -137,10 +159,9 @@ YOUR TASK: Research this COMPANY using Google Search and provide:
 
 4. **fund.sectors** - Investment focus areas as array
    Use ONLY these standardized values:
-   {', '.join(self.standard_sectors[:20])}... (and similar)
+   {', '.join(self.standard_sectors)}
 
-   - Map existing sectors to standard values
-   - Add sectors found through research
+   - Map to standard values only - do not invent new sectors
    - Return as array: ["sector-1", "sector-2", ...]
 
 5. **fund.preferred_stage** - Investment stage focus
@@ -150,19 +171,20 @@ YOUR TASK: Research this COMPANY using Google Search and provide:
 6. **fund.city** - Headquarters city (if missing: {city or 'MISSING'})
 
 RULES:
-- Focus search on the COMPANY and its investment activities
+- Focus search on the COMPANY "{company_name}" and its investment activities
+- CRITICAL: fund.linkedin MUST be /company/ URL, NEVER /in/ URL
 - Only URLs in correct format (https://, no trailing slashes)
-- Sectors must use standardized values only
+- Sectors must use ONLY the standardized values listed above
 - Use null for fields you cannot verify
 - Verify all URLs are official and correct
 
 RETURN FORMAT (JSON only):
 {{
-  "fund.linkedin": "string or null",
+  "fund.linkedin": "string or null (MUST be /company/ URL or null)",
   "fund.crunchbase": "string or null",
   "fund.website": "string or null",
   "fund.city": "string or null",
-  "fund.sectors": ["array of standardized sectors"],
+  "fund.sectors": ["array of standardized sectors only"],
   "fund.preferred_stage": "string or null",
   "_stage_meta": {{
     "confidence": "high|medium|low",
