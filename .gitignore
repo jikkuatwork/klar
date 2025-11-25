@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+*.egg-info/
+
+# Enrichment artifacts
+.enrichment_progress
+enrichment_errors.log
+
+# Test outputs
+test_*.csv
+test_*.json
+
+# Environment
+.env
+.venv/
