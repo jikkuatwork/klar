@@ -3,8 +3,6 @@
  */
 
 const Header = (function() {
-  let searchInput = null;
-
   /**
    * Render header
    */
@@ -19,20 +17,6 @@ const Header = (function() {
           <img src="/assets/logo.svg" alt="Klar" class="w-8 h-8">
           <span class="font-semibold text-lg hidden sm:inline">Klar</span>
         </a>
-
-        <!-- Search -->
-        <div class="flex-1 max-w-md mx-4">
-          <div class="relative">
-            <input
-              type="search"
-              id="global-search"
-              class="input pl-10 pr-4 w-full"
-              placeholder="Search investors, funds..."
-              autocomplete="off"
-            >
-            <i data-feather="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40"></i>
-          </div>
-        </div>
 
         <!-- Actions -->
         <div class="flex items-center gap-2">
@@ -69,51 +53,29 @@ const Header = (function() {
       feather.replace();
     }
 
-    // Setup search
-    setupSearch();
-
     // Setup theme toggle
     setupThemeToggle();
 
     // Setup add investor button
     setupAddButton();
+
+    // Setup search shortcut (Cmd/Ctrl+K)
+    setupSearchShortcut();
   }
 
   /**
-   * Setup search functionality
+   * Setup keyboard shortcut for search focus
    */
-  function setupSearch() {
-    searchInput = $('#global-search');
-    if (!searchInput) return;
-
-    const debouncedSearch = debounce((value) => {
-      State.set('searchQuery', value);
-
-      // Navigate to list tab if not already there and has query
-      if (value && State.get('activeTab') !== 'list') {
-        Router.navigate('list');
-      }
-    }, 300);
-
-    searchInput.addEventListener('input', (e) => {
-      debouncedSearch(e.target.value);
-    });
-
-    // Clear search on Escape
-    searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        searchInput.value = '';
-        State.set('searchQuery', '');
-        searchInput.blur();
-      }
-    });
-
-    // Keyboard shortcut: Cmd/Ctrl + K to focus search
+  function setupSearchShortcut() {
+    // Keyboard shortcut: Cmd/Ctrl + K to focus search in filter bar
     document.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        searchInput.focus();
-        searchInput.select();
+        const filterSearch = $('#filter-search');
+        if (filterSearch) {
+          filterSearch.focus();
+          filterSearch.select();
+        }
       }
     });
   }
@@ -158,28 +120,8 @@ const Header = (function() {
     addBtnMobile?.addEventListener('click', handleAdd);
   }
 
-  /**
-   * Update search input value (e.g., from state)
-   */
-  function setSearchValue(value) {
-    if (searchInput) {
-      searchInput.value = value;
-    }
-  }
-
-  /**
-   * Focus search input
-   */
-  function focusSearch() {
-    if (searchInput) {
-      searchInput.focus();
-    }
-  }
-
   // Public API
   return {
-    render,
-    setSearchValue,
-    focusSearch
+    render
   };
 })();
