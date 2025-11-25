@@ -219,7 +219,6 @@ YOUR TASK: Research this investment firm's strategy and portfolio using Google S
 
 1. **fund.description** - Company overview (3-4 sentences)
    - What they do and their market position
-   - AUM or fund size (if public)
    - Year founded and key milestones
    - Notable achievements or recognition
 
@@ -240,11 +239,27 @@ YOUR TASK: Research this investment firm's strategy and portfolio using Google S
      }}
    ]
 
-4. **fund.aum** - Assets under management (if public)
-   - Include currency and year
-   - Example: "$500M (2024)"
+4. **fund.aum** - Assets under management as RAW NUMBER IN USD
+   - MUST be a raw integer in USD (no symbols, no commas, no currency signs)
+   - Convert all currencies to USD (use approximate current rates: 1 EUR = 1.08 USD, 1 GBP = 1.27 USD)
+   - Examples: 500000000 (for $500M), 1200000000 (for $1.2B), 25600000000 (for $25.6B)
+   - Return null if not publicly available
 
-5. **fund.geographies** - Geographic investment focus (array)
+5. **fund.aum_year** - Year of the AUM figure
+   - Return as integer: 2024, 2023, etc.
+   - Return null if unknown
+
+6. **fund.ticket_size_min** - Minimum investment ticket size as RAW NUMBER IN USD
+   - MUST be a raw integer in USD (no symbols)
+   - Example: 2000000 (for $2M minimum)
+   - Return null if not publicly available
+
+7. **fund.ticket_size_max** - Maximum investment ticket size as RAW NUMBER IN USD
+   - MUST be a raw integer in USD (no symbols)
+   - Example: 20000000 (for $20M maximum)
+   - Return null if not publicly available
+
+8. **fund.geographies** - Geographic investment focus (array)
    - Countries or regions they invest in
    - Example: ["North America", "Europe", "Asia-Pacific"]
 
@@ -254,6 +269,7 @@ RULES:
 - Be specific and factual, no speculation
 - Portfolio companies must be real and verified
 - Focus on recent, relevant information
+- ALL FINANCIAL FIGURES MUST BE RAW INTEGERS IN USD - no formatting, no symbols
 
 RETURN FORMAT (JSON only):
 {{
@@ -267,7 +283,10 @@ RETURN FORMAT (JSON only):
       "description": "string"
     }}
   ],
-  "fund.aum": "string or null",
+  "fund.aum": integer or null,
+  "fund.aum_year": integer or null,
+  "fund.ticket_size_min": integer or null,
+  "fund.ticket_size_max": integer or null,
   "fund.geographies": ["array of regions"],
   "_stage_meta": {{
     "confidence": "high|medium|low",
@@ -487,8 +506,9 @@ Return ONLY valid JSON, no additional text."""
 
                     # Merge into enriched_data
                     for key in ['fund.description', 'fund.thesis', 'fund.portfolio_companies',
-                               'fund.aum', 'fund.geographies']:
-                        if key in deep_data and deep_data[key]:
+                               'fund.aum', 'fund.aum_year', 'fund.ticket_size_min',
+                               'fund.ticket_size_max', 'fund.geographies']:
+                        if key in deep_data and deep_data[key] is not None:
                             enriched_data[key] = deep_data[key]
 
                     meta = deep_data.get('_stage_meta', {})

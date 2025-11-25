@@ -157,7 +157,8 @@ def main():
     # Add enriched fields that may not exist in source
     enriched_fields = [
         "poc.description", "fund.description", "fund.thesis",
-        "fund.portfolio_companies", "fund.aum", "fund.geographies",
+        "fund.portfolio_companies", "fund.aum", "fund.aum_year",
+        "fund.ticket_size_min", "fund.ticket_size_max", "fund.geographies",
         "_validation_issues"  # Track quality issues
     ]
     for f in enriched_fields:
