@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Klar - Capital, Clarified. Investor CRM for Silversky Capital.">
+  <meta name="theme-color" content="#15213B">
+
+  <title>Klar - Capital, Clarified</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              DEFAULT: '#DEC26F',
+              50: '#FCF8ED',
+              100: '#F9F1DB',
+              200: '#F2E3B7',
+              300: '#ECD593',
+              400: '#E5C881',
+              500: '#DEC26F',
+              600: '#D4AF37',
+              700: '#A98B2C',
+              800: '#7E6821',
+              900: '#534516'
+            },
+            secondary: {
+              DEFAULT: '#15213B',
+              50: '#E8EAF0',
+              100: '#D1D5E1',
+              200: '#A3ABC3',
+              300: '#7580A5',
+              400: '#4A5682',
+              500: '#15213B',
+              600: '#121C32',
+              700: '#0F1729',
+              800: '#0C1220',
+              900: '#090D17'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Flag Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body class="h-full font-sans bg-white text-secondary dark:bg-secondary dark:text-white antialiased">
+  <!-- App Container - Fixed viewport, no page scroll -->
+  <div id="app" class="h-full flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header id="header" class="flex-shrink-0 border-b border-secondary/10 dark:border-white/10">
+      <!-- Populated by js/components/header.js -->
+    </header>
+
+    <!-- Tab Bar -->
+    <nav id="tabs" class="flex-shrink-0 border-b border-secondary/10 dark:border-white/10 bg-secondary-50/50 dark:bg-secondary-600/50">
+      <!-- Populated by js/components/tabs.js -->
+    </nav>
+
+    <!-- Main Content - Scrollable -->
+    <main id="content" class="flex-1 overflow-y-auto">
+      <!-- Populated by js/pages/*.js -->
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toasts" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+      <!-- Toasts appear here -->
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="fixed inset-0 bg-secondary/90 flex items-center justify-center z-50">
+      <div class="text-center">
+        <img src="/assets/logo.svg" alt="Klar" class="w-16 h-16 mx-auto mb-4 animate-pulse">
+        <p class="text-white/80 text-sm">Loading...</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/idb-keyval@6/dist/umd.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+  <!-- App Modules -->
+  <script src="/js/utils/helpers.js"></script>
+  <script src="/js/utils/format.js"></script>
+  <script src="/js/utils/csv.js"></script>
+  <script src="/js/store.js"></script>
+  <script src="/js/state.js"></script>
+  <script src="/js/components/toast.js"></script>
+  <script src="/js/components/header.js"></script>
+  <script src="/js/components/tabs.js"></script>
+  <script src="/js/router.js"></script>
+  <script src="/js/pages/dashboard.js"></script>
+  <script src="/js/pages/list.js"></script>
+  <script src="/js/pages/map.js"></script>
+  <script src="/js/pages/charts.js"></script>
+  <script src="/js/pages/saved.js"></script>
+  <script src="/js/pages/chat.js"></script>
+  <script src="/js/pages/settings.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
